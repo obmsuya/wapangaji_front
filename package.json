@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@rn-primitives/checkbox": "^1.1.0",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
     "expo": "~52.0.23",
@@ -19,6 +20,7 @@
     "expo-router": "~4.0.15",
     "expo-splash-screen": "~0.29.18",
     "expo-status-bar": "~2.0.0",
+    "lucide-react-native": "^0.469.0",
     "nativewind": "^4.1.23",
     "react": "18.3.1",
     "react-native": "0.76.5",
