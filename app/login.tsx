@@ -83,6 +83,10 @@ export default function login() {
                         </View>
                         <View className="py-0.5" />
                         <Button>Login</Button>
+                        <View className="py-0.5" />
+                        <Text className="mx-auto text-center self-center items-center">
+                            Don't have an account? <Link href="/register" className="text-primary">Register</Link>
+                        </Text>
                     </View>
                 </View>
             </View>
