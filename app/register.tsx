@@ -60,6 +60,7 @@ export default function register() {
                 extraScrollHeight={200} // Adjust this value as needed
                 showsVerticalScrollIndicator={false}
                 keyboardOpeningTime={0}
+                keyboardShouldPersistTaps="handled"
             >
 
                 <Button className="bg-primary w-12 h-12 rounded-full p-2 items-center justify-center"
@@ -110,6 +111,7 @@ export default function register() {
                                     values.phoneNumber,
                                     values.password
                                 );
+                                router.navigate("/otp")
                             }}
                         >
                             {({ handleChange, handleSubmit, errors, isValid, values }) => (
@@ -120,7 +122,7 @@ export default function register() {
                                                 {errors.name ? errors.name : "Your full name"}
                                             </Text>
                                             <Input
-                                                placeholder="Enter your mobile number"
+                                                placeholder="Enter your full name"
                                                 onChangeText={handleChange('name')}
                                                 value={values.name}
                                                 className={
@@ -167,11 +169,11 @@ export default function register() {
                                             disabled={!isValid}
                                             className={!isValid ? "opacity-75" : ""}
                                         >
-                                            Login
+                                            Create Account
                                         </Button>
                                         <View className="py-0.5" />
                                         <Text className="mx-auto text-center self-center items-center">
-                                            Don't have an account? <Link href="/register" className="text-primary">Register</Link>
+                                            Already have an account? <Link href="/login" className="text-primary">Login</Link>
                                         </Text>
                                     </View>
                                 </>

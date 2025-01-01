@@ -165,7 +165,7 @@ export default function login() {
                                             disabled={!isValid}
                                             className={!isValid ? "opacity-75" : ""}
                                         >
-                                            Create Account
+                                            Login
                                         </Button>
                                         <View className="py-0.5" />
                                         <Text className="mx-auto text-center self-center items-center">
