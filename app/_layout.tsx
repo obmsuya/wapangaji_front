@@ -11,6 +11,8 @@ import * as SplashScreen from 'expo-splash-screen';
 // Import your global CSS file
 import "@/global.css";
 import { StatusBar } from "expo-status-bar";
+import Toast from "react-native-toast-message";
+import toastConfig from "@/lib/toastConfig";
 
 export default function RootLayout() {
     const [loaded, error] = useFonts({
@@ -32,6 +34,7 @@ export default function RootLayout() {
             <View className="flex-1">
                 <StatusBar style="auto" />
                 <Slot />
+                <Toast config={toastConfig}/>
             </View>
         </AuthProvider>
     )

@@ -30,7 +30,11 @@ const registerSchema = yup.object().shape({
         .required("Please enter your mobile number."),
     password: yup.string()
         .trim()
-        .min(4, "Password should be at least 4 characters long.")
+        .min(8, "Password should be at least 8 characters long.")
+        .matches(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
+            "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
+        )
         .required('Please enter your password')
 })
 

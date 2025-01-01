@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react"
 import { Image } from "expo-image";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context"
+import Toast from "react-native-toast-message";
 import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
@@ -104,6 +105,19 @@ export default function login() {
                                     values.phoneNumber,
                                     values.password
                                 );
+                                if(values.phoneNumber === "0712345678" && values.password === "1234"){
+                                    Toast.show({
+                                        type: "success",
+                                        text1: "Login Successful",
+                                        text2: "Welcome to Wapangaji Kiganjani"
+                                    })
+                                } else {
+                                    Toast.show({
+                                        type: "error",
+                                        text1: "Login Failed",
+                                        text2: "Invalid password or phone number"
+                                    })
+                                }
                             }}
                         >
                             {({ handleChange, handleSubmit, setFieldValue, errors, isValid, values }) => (
