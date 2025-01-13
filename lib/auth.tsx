@@ -28,9 +28,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Load tokens from AsyncStorage on app start
     useEffect(() => {
-        const loadTokens = async () => {
-            const storedAccessToken = await AsyncStorage.getItem('accessToken');
-            const storedRefreshToken = await AsyncStorage.getItem('refreshToken');
+        const loadStoredTokens = async () => {
+            const [storedAccessToken, storedRefreshToken] = await Promise.all([
+                AsyncStorage.getItem('accessToken'),
+                AsyncStorage.getItem('refreshToken'),
+            ]);
 
             if (storedAccessToken && storedRefreshToken) {
                 setAccessToken(storedAccessToken);
@@ -39,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
         };
 
-        loadTokens();
+        loadStoredTokens();
     }, []);
 
     const login = async (phone_number: string, password: string) => {
@@ -72,7 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             Toast.show({
                 type: "error",
                 text1: "Login Failed!",
-                text2: `${error ? error.response : "Something went wrong. Please try again."}`
+                text2: `${error ? error?.message : "Something went wrong. Please try again."}`
             });
         } finally {
             setIsLoading(false);

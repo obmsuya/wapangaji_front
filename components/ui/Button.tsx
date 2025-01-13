@@ -7,19 +7,21 @@ interface ButtonProps extends PressableProps {
     children?: React.ReactNode;
     onPress?: () => void;
     className?: string; // Add className to the props interface
+    textClassName?: string; // Add className to the props interface
 }
 
 export const Button: React.FunctionComponent<ButtonProps> = ({
     children,
     onPress,
     className,
+    textClassName,
     ...buttonActions
 }) => {
     return (
         <Pressable
             className={cn("bg-primary px-6 py-3 rounded-2xl overflow-hidden items-center justify-center", className)}
             android_ripple={{
-                color: "#000000",
+                color: "#919191",
                 borderless: false,
                 foreground: true
             }}
@@ -27,7 +29,11 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
             onPress={onPress}
             style={{ alignItems: "center", gap: 8, overflow: "hidden" }}
         >
-            <Text className="text-white text-xl font-medium mx-auto text-center items-center gap-6">{children}</Text>
+            <Text
+                className={cn("text-white text-xl font-medium mx-auto text-center items-center gap-6", textClassName)}
+            >
+                {children}
+            </Text>
         </Pressable>
     )
 }

@@ -8,6 +8,8 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
 import * as SplashScreen from 'expo-splash-screen';
 
+import { PortalHost } from '@rn-primitives/portal';
+
 // Import your global CSS file
 import "@/global.css";
 import Toast from "react-native-toast-message";
@@ -32,11 +34,17 @@ export default function RootLayout() {
     return (
         <AuthProvider>
             <SafeAreaProvider>
-                <View className="flex-1">
+                <View
+                    className="flex-1"
+                    style={{
+                        backgroundColor: "#fff",
+                    }}
+                >
                     <Slot />
                     <StatusBar style="auto" />
                     <Toast config={toastConfig} />
                 </View>
+                <PortalHost />
             </SafeAreaProvider>
         </AuthProvider>
     )

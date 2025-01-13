@@ -9,8 +9,16 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "1.23.1",
     "@rn-primitives/checkbox": "^1.1.0",
+    "@rn-primitives/dialog": "^1.1.0",
+    "@rn-primitives/hooks": "^1.1.0",
+    "@rn-primitives/portal": "^1.1.0",
+    "@rn-primitives/slot": "^1.1.0",
+    "@rn-primitives/types": "^1.1.0",
+    "@shopify/flash-list": "1.7.1",
     "axios": "^1.7.9",
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "expo": "~52.0.23",
     "expo-constants": "~17.0.3",
@@ -35,8 +43,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^3.4.17",
     "yup": "^1.6.1",
-    "zustand": "^5.0.2",
-    "@react-native-async-storage/async-storage": "1.23.1"
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
