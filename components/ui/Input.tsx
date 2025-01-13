@@ -14,12 +14,13 @@ const Input = React.forwardRef<React.ElementRef<typeof TextInput>, TextInputProp
                 onFocus={() => setFocusBg("bg-secondary")}
                 onBlur={() => setBlurBg("bg-secondary")}
                 className={cn(
-                    `first-letter:h-10 native:h-12 rounded-2xl bg-[#f2f2f2] px-3 text-base lg:text-sm native:text-lg native:leading-[1.25] file:border-0 file:bg-transparent file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+                    `first-letter:h-10 native:h-12 rounded-2xl bg-[#f2f2f2] text-base lg:text-sm native:text-lg native:leading-[1.25] file:border-0 file:bg-transparent file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
                     `,
-                    props.editable === false && 'opacity-50 web:cursor-not-allowed p-3',
+                    props.editable === false && 'opacity-50 web:cursor-not-allowed',
                     className
                 )}
-                placeholderClassName={cn('text-muted-foreground p-3', placeholderClassName)}
+                placeholderClassName={cn('text-muted-foreground', placeholderClassName)}
+                style={{paddingHorizontal: 12}}
                 {...props}
             />
         );

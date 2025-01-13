@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 import { Image } from "expo-image";
-import { View } from "react-native";
+import { TextInput, TouchableOpacity, View } from "react-native";
 import { ArrowLeft } from 'lucide-react-native';
 import { SafeAreaView } from "react-native-safe-area-context"
 import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
@@ -16,17 +16,21 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import * as yup from "yup"
 import { Formik } from "formik";
 import { useKeyboardVisibility } from "@/lib/useKeyboard";
+import { useAuth } from "@/lib/auth";
+
+import { Eye, EyeClosed } from "lucide-react-native";
+import { ActivityIndicator } from "react-native";
 
 const registerSchema = yup.object().shape({
-    name: yup.string().required("Please enter your full name"),
-    phoneNumber: yup.string()
+    full_name: yup.string().required("Please enter your full name"),
+    phone_number: yup.string()
         .trim()
         .matches(
-            /^(07|06)\d{8}$/,
-            "Your mobile number should start with 07 or 06 followed by 8 other digits."
+            /^\+255\d{9}$/,
+            "Your mobile number should start with +255 followed by 9 other digits."
         )
-        .min(10, "Mobile number should contain 10 digits.")
-        .max(10, "Mobile number should contain 10 digits.")
+        .min(13, "Invalid phone number.")
+        .max(13, "Invalid phone number.")
         .required("Please enter your mobile number."),
     password: yup.string()
         .trim()
@@ -40,6 +44,11 @@ const registerSchema = yup.object().shape({
 
 export default function register() {
     const router = useRouter()
+    const { register, isLoading } = useAuth()
+    const [showPassword, setShowPassword] = useState(true)
+
+    const phoneNumberInputRef = useRef<TextInput>(null)
+    const passwordInputRef = useRef<TextInput>(null)
 
     const keyboard = useKeyboardVisibility()
     const scale = useSharedValue(1)
@@ -57,7 +66,7 @@ export default function register() {
     }, [keyboard])
 
     return (
-        <SafeAreaView className="px-4 py-2 relative">
+        <SafeAreaView className="px-[20%] py-2 relative">
             <KeyboardAwareScrollView
                 enableOnAndroid={false}
                 enableAutomaticScroll={true}
@@ -66,17 +75,16 @@ export default function register() {
                 keyboardOpeningTime={0}
                 keyboardShouldPersistTaps="handled"
             >
-
-                <Button className="bg-primary w-12 h-12 rounded-full p-2 items-center justify-center"
+                <Button className="bg-primary w-10 h-10 rounded-full p-2 items-center justify-center"
                     android_ripple={{
                         color: "#ffffff"
                     }}
                     onPress={() => router.back()}
                 >
-                    <ArrowLeft size={24} color="#fff" className="self-items" />
+                    <ArrowLeft size={24} color="#fff" className="self-center" />
                 </Button>
 
-                <View className={keyboard ? "mt-0" : "mt-16"}>
+                <View className={keyboard ? "mt-0" : "mt-[12.5%]"}>
                     <Animated.View
                         style={{
                             transform: [{
@@ -87,8 +95,8 @@ export default function register() {
                         <Image
                             source={img.uri}
                             style={{
-                                width: 92,
-                                height: 164,
+                                width: 92 * 1.25,
+                                height: 164 * 1.25,
                                 justifyContent: "center",
                                 alignSelf: "center"
                             }}
@@ -105,75 +113,87 @@ export default function register() {
                         <Formik
                             validationSchema={registerSchema}
                             initialValues={{
-                                name: "",
-                                phoneNumber: "",
+                                phone_number: "",
+                                full_name: "",
                                 password: ""
                             }}
                             onSubmit={values => {
-                                console.log(
-                                    values.name,
-                                    values.phoneNumber,
-                                    values.password
-                                );
-                                router.navigate("/otp")
+                                register(values.phone_number, values.full_name, values.password, "en")
                             }}
                         >
                             {({ handleChange, handleSubmit, errors, isValid, values }) => (
                                 <>
+
                                     <View className="flex flex-col gap-2">
                                         <View className="gap-2">
-                                            <Text className={errors.name ? "text-destructive" : ""}>
-                                                {errors.name ? errors.name : "Your full name"}
+                                            <Text className={errors.full_name ? "text-destructive" : ""}>
+                                                {errors.full_name ? errors.full_name : "Your full name"}
                                             </Text>
                                             <Input
                                                 placeholder="Enter your full name"
-                                                onChangeText={handleChange('name')}
-                                                value={values.name}
-                                                className={
-                                                    errors.name ?
-                                                        "bg-destructive/10 border-destructive border-2 text-destructive p-3"
-                                                        : ""
-                                                }
-                                                placeholderClassName={errors.name ? "text-destructive" : ""}
+                                                onChangeText={handleChange('full_name')}
+                                                value={values.full_name}
+                                                returnKeyType="next"
+                                                className={errors.full_name ? "bg-destructive/10 border-destructive border-2 text-destructive" : ""}
+                                                onSubmitEditing={() => phoneNumberInputRef.current?.focus()}
+                                                placeholderClassName={errors.full_name ? "text-destructive" : ""}
+                                                autoCapitalize="words"
+                                                autoCorrect={false}
                                             />
                                         </View>
                                         <View className="gap-2">
-                                            <Text className={errors.phoneNumber ? "text-destructive" : ""}>
-                                                {errors.phoneNumber ? errors.phoneNumber : "Mobile Number"}
+                                            <Text className={errors.phone_number ? "text-destructive" : ""}>
+                                                {errors.phone_number ? errors.phone_number : "Mobile Number"}
                                             </Text>
                                             <Input
                                                 placeholder="Enter your mobile number"
-                                                onChangeText={handleChange('phoneNumber')}
-                                                value={values.phoneNumber}
+                                                onChangeText={handleChange('phone_number')}
+                                                ref={phoneNumberInputRef}
+                                                value={values.phone_number}
+                                                returnKeyType="next"
+                                                inputMode="tel"
+                                                onSubmitEditing={() => passwordInputRef?.current?.focus()}
                                                 className={
-                                                    errors.phoneNumber ?
+                                                    errors.phone_number ?
                                                         "bg-destructive/10 border-destructive border-2 text-destructive p-3"
-                                                        : ""
+                                                        : "text-black border-0"
                                                 }
-                                                placeholderClassName={errors.phoneNumber ? "text-destructive" : ""}
+                                                placeholderClassName={errors.phone_number ? "text-destructive" : ""}
                                             />
                                         </View>
-                                        <View className="gap-2">
-                                            <Text className={errors.password ? "text-destructive" : ""}>
+                                        <View className="gap-2 relative">
+                                            <Text className={errors.password ? "text-destructive" : "text-black"}>
                                                 {errors.password ? errors.password : "Password"}
                                             </Text>
-                                            <Input
-                                                placeholder="Enter your password"
-                                                onChangeText={handleChange('password')}
-                                                value={values.password}
-                                                className={
-                                                    errors.password ?
-                                                        "bg-destructive/10 border-destructive border-2 text-destructive p-3" : ""
-                                                }
-                                            />
+                                            <View className="relative">
+                                                <Input
+                                                    ref={passwordInputRef}
+                                                    placeholder="Enter your password"
+                                                    onChangeText={handleChange('password')}
+                                                    value={values.password}
+                                                    secureTextEntry={showPassword}
+                                                    returnKeyType="done"
+                                                    autoCorrect={false}
+                                                    className={errors.password ? "bg-destructive/10 border-destructive border-2 text-destructive p-3" : "text-black border-0"}
+                                                />
+                                                <TouchableOpacity
+                                                    className="absolute right-[1.5%] top-[22.5%]"
+                                                    onPress={() => setShowPassword(!showPassword)}
+                                                >
+                                                    {
+                                                        showPassword ? <Eye color="#3a4a5a" /> : <EyeClosed color="#3a4a5a" />
+                                                    }
+                                                </TouchableOpacity>
+                                            </View>
                                         </View>
                                         <View className="py-0.5" />
                                         <Button
                                             onPress={handleSubmit}
-                                            disabled={!isValid}
-                                            className={!isValid ? "opacity-75" : ""}
+                                            disabled={isLoading || !isValid}
+                                            className={`${(isLoading || !isValid) ? "opacity-75" : ""}`}
                                         >
-                                            Create Account
+                                            {isLoading ? "Loading..." : "Create Account"}
+                                            {isLoading && <ActivityIndicator size="small" color="#ffffff" style={{ marginTop: 20, paddingHorizontal: 8 }} />}
                                         </Button>
                                         <View className="py-0.5" />
                                         <Text className="mx-auto text-center self-center items-center">

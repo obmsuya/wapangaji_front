@@ -19,12 +19,15 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
         <Pressable
             className={cn("bg-primary px-6 py-3 rounded-2xl overflow-hidden items-center justify-center", className)}
             android_ripple={{
-                color: "#000000"
+                color: "#000000",
+                borderless: false,
+                foreground: true
             }}
             {...buttonActions}
             onPress={onPress}
+            style={{ alignItems: "center", gap: 8, overflow: "hidden" }}
         >
-            <Text className="text-white text-xl font-medium mx-auto text-center">{children}</Text>
+            <Text className="text-white text-xl font-medium mx-auto text-center items-center gap-6">{children}</Text>
         </Pressable>
     )
 }

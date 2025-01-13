@@ -1,18 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Slot } from "expo-router";
 import { AuthProvider } from "@/lib/auth"
 
 import { View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { useFonts } from "expo-font";
 import * as SplashScreen from 'expo-splash-screen';
 
 // Import your global CSS file
 import "@/global.css";
-import { StatusBar } from "expo-status-bar";
 import Toast from "react-native-toast-message";
 import toastConfig from "@/lib/toastConfig";
+import { StatusBar } from "expo-status-bar";
 
 export default function RootLayout() {
     const [loaded, error] = useFonts({
@@ -31,15 +31,13 @@ export default function RootLayout() {
 
     return (
         <AuthProvider>
-            <View className="flex-1">
-                <StatusBar style="auto" />
-                <Slot />
-                <Toast config={toastConfig}/>
-            </View>
+            <SafeAreaProvider>
+                <View className="flex-1">
+                    <Slot />
+                    <StatusBar style="auto" />
+                    <Toast config={toastConfig} />
+                </View>
+            </SafeAreaProvider>
         </AuthProvider>
     )
-}
-
-function useEffect(arg0: () => void, arg1: (boolean | Error | null)[]) {
-    throw new Error("Function not implemented.");
 }
