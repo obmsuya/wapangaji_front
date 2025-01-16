@@ -17,7 +17,7 @@ export default function index() {
 
   return (
     <ScrollView
-      className="flex-1 p-8"
+      className="flex-1 p-4"
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 36 }}
     >

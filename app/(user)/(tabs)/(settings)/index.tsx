@@ -9,22 +9,14 @@ export default function settings() {
     const router = useRouter();
 
     return (
-        <SafeAreaView className="p-4 relative">
-            <Text className="text-5xl font-bold m-4">Settings</Text>
+        <SafeAreaView className="p-8 relative">
+            <Text className="text-5xl font-bold mb-8">Settings</Text>
 
             <View>
-                <Pressable onPress={() => router.push("/settings/account")} className="flex-row p-2 justify-between items-center gap-4">
-                    <View className="flex-row items-center gap-4">
-                        <View className="bg-primary w-10 h-10 items-center justify-center rounded-full">
-                            <User2Icon color="#ffffff" size={16} />
-                        </View>
-                        <Text className="text-xl">Account</Text>
-                    </View>
-                    <View>
-                        <ChevronRight color="#2B4B80" size={24} />
-                    </View>
-                </Pressable>
-                <Pressable onPress={() => router.push("/settings/preference")} className="flex-row p-2 justify-between items-center gap-4">
+                <Pressable
+                    onPress={() => router.push("/settings/preference")}
+                    className="flex-row py-2 justify-between items-center gap-4"
+                >
                     <View className="flex-row items-center gap-4">
                         <View className="bg-primary w-10 h-10 items-center justify-center rounded-full">
                             <Eye color="#ffffff" size={16} />
@@ -35,7 +27,10 @@ export default function settings() {
                         <ChevronRight color="#2B4B80" size={24} />
                     </View>
                 </Pressable>
-                <Pressable onPress={() => router.push("/settings/subscription")} className="flex-row p-2 justify-between items-center gap-4">
+                <Pressable
+                    onPress={() => router.push("/settings/subscription")}
+                    className="flex-row py-2 justify-between items-center gap-4"
+                >
                     <View className="flex-row items-center gap-4">
                         <View className="bg-primary w-10 h-10 items-center justify-center rounded-full">
                             <CircleDollarSign color="#ffffff" size={16} />
@@ -46,7 +41,24 @@ export default function settings() {
                         <ChevronRight color="#2B4B80" size={24} />
                     </View>
                 </Pressable>
-                <Pressable onPress={() => router.push("/settings/faq")} className="flex-row p-2 justify-between items-center gap-4">
+                <Pressable
+                    onPress={() => router.push("/settings/reset-password")}
+                    className="flex-row py-2 justify-between items-center gap-4"
+                >
+                    <View className="flex-row items-center gap-4">
+                        <View className="bg-primary w-10 h-10 items-center justify-center rounded-full">
+                            <User2Icon color="#ffffff" size={16} />
+                        </View>
+                        <Text className="text-xl">Account</Text>
+                    </View>
+                    <View>
+                        <ChevronRight color="#2B4B80" size={24} />
+                    </View>
+                </Pressable>
+                <Pressable
+                    onPress={() => router.push("/settings/faq")}
+                    className="flex-row py-2 justify-between items-center gap-4"
+                >
                     <View className="flex-row items-center gap-4">
                         <View className="bg-primary w-10 h-10 items-center justify-center rounded-full">
                             <CircleHelp color="#ffffff" size={16} />
@@ -55,6 +67,21 @@ export default function settings() {
                     </View>
                     <View>
                         <ChevronRight color="#2B4B80" size={24} />
+                    </View>
+                </Pressable>
+
+                <Pressable
+                    onPress={() => router.push("/settings/faq")}
+                    className="flex-row py-2 justify-between items-center gap-4"
+                >
+                    <View className="flex-row items-center gap-4">
+                        <View className="bg-destructive w-10 h-10 items-center justify-center rounded-full">
+                            <CircleHelp color="#ffffff" size={16} />
+                        </View>
+                        <Text className="text-xl text-destructive">Logout</Text>
+                    </View>
+                    <View>
+                        <ChevronRight color="#e63946" size={24} />
                     </View>
                 </Pressable>
             </View>

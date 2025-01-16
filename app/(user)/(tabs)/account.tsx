@@ -21,7 +21,7 @@ import { useAuth } from "@/lib/auth";
 import { Eye, EyeClosed } from "lucide-react-native";
 import { ActivityIndicator } from "react-native";
 
-const registerSchema = yup.object().shape({
+const accountSchema = yup.object().shape({
     full_name: yup.string().required("Please enter your full name"),
     phone_number: yup.string()
         .trim()
@@ -32,20 +32,11 @@ const registerSchema = yup.object().shape({
         .min(13, "Invalid phone number.")
         .max(13, "Invalid phone number.")
         .required("Please enter your mobile number."),
-    password: yup.string()
-        .trim()
-        .min(8, "Password should be at least 8 characters long.")
-        .matches(
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
-            "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
-        )
-        .required('Please enter your password')
 })
 
 export default function register() {
     const router = useRouter()
-    const { register, isLoading } = useAuth()
-    const [showPassword, setShowPassword] = useState(true)
+    const { isLoading } = useAuth()
 
     const phoneNumberInputRef = useRef<TextInput>(null)
     const passwordInputRef = useRef<TextInput>(null)
@@ -54,7 +45,7 @@ export default function register() {
     const scale = useSharedValue(1)
 
     const img = {
-        uri: require("@/assets/images/illustrations/register-user.svg")
+        uri: require("@/assets/images/illustrations/account.svg")
     }
 
     useEffect(() => {
@@ -66,7 +57,7 @@ export default function register() {
     }, [keyboard])
 
     return (
-        <SafeAreaView className="px-[20%] py-2 relative bg-white flex-1">
+        <SafeAreaView className="px-[20%] py-2 relative bg-white flex-1 justify-center items-center">
             <KeyboardAwareScrollView
                 enableOnAndroid={false}
                 enableAutomaticScroll={true}
@@ -74,17 +65,11 @@ export default function register() {
                 showsVerticalScrollIndicator={false}
                 keyboardOpeningTime={0}
                 keyboardShouldPersistTaps="handled"
+                contentContainerClassName="justify-center items-center flex-1"
             >
-                <Button className="bg-primary w-10 h-10 rounded-full p-2 items-center justify-center"
-                    android_ripple={{
-                        color: "#ffffff"
-                    }}
-                    onPress={() => router.back()}
-                >
-                    <ArrowLeft size={24} color="#fff" className="self-center" />
-                </Button>
 
                 <View className={keyboard ? "mt-0" : "mt-[12.5%]"}>
+                    <Text className={`text-center text-4xl font-bold ${keyboard ? "mb-4" : "mb-12"}`}>Your Account</Text>
                     <Animated.View
                         style={{
                             transform: [{
@@ -95,8 +80,8 @@ export default function register() {
                         <Image
                             source={img.uri}
                             style={{
-                                width: 92 * 1.25,
-                                height: 164 * 1.25,
+                                width: 179,
+                                height: 179,
                                 justifyContent: "center",
                                 alignSelf: "center"
                             }}
@@ -105,20 +90,15 @@ export default function register() {
                     </Animated.View>
 
                     <View className={keyboard ? "mt-4" : "mt-12"}>
-                        <Text className="text-4xl font-bold text-center text-primary" style={{ color: "#2B4B80" }}>
-                            Create Account
-                        </Text>
-                        <View className="py-4" />
-
                         <Formik
-                            validationSchema={registerSchema}
+                            validationSchema={accountSchema}
                             initialValues={{
                                 phone_number: "",
                                 full_name: "",
                                 password: ""
                             }}
                             onSubmit={values => {
-                                register(values.phone_number, values.full_name, values.password, "en")
+                                console.log(values.phone_number, values.full_name, values.password, "en")
                             }}
                         >
                             {({ handleChange, handleSubmit, errors, isValid, values }) => (
@@ -161,44 +141,28 @@ export default function register() {
                                                 placeholderClassName={errors.phone_number ? "text-destructive" : ""}
                                             />
                                         </View>
-                                        <View className="gap-2 relative">
-                                            <Text className={errors.password ? "text-destructive" : "text-black"}>
-                                                {errors.password ? errors.password : "Password"}
-                                            </Text>
-                                            <View className="relative">
-                                                <Input
-                                                    ref={passwordInputRef}
-                                                    placeholder="Enter your password"
-                                                    onChangeText={handleChange('password')}
-                                                    value={values.password}
-                                                    secureTextEntry={showPassword}
-                                                    returnKeyType="done"
-                                                    autoCorrect={false}
-                                                    className={errors.password ? "bg-destructive/10 border-destructive border-2 text-destructive p-3" : "text-black border-0"}
-                                                />
-                                                <TouchableOpacity
-                                                    className="absolute right-[1.5%] top-[22.5%]"
-                                                    onPress={() => setShowPassword(!showPassword)}
-                                                >
-                                                    {
-                                                        showPassword ? <Eye color="#3a4a5a" /> : <EyeClosed color="#3a4a5a" />
-                                                    }
-                                                </TouchableOpacity>
-                                            </View>
-                                        </View>
-                                        <View className="py-0.5" />
+                                        <View className="py-2" />
                                         <Button
                                             onPress={handleSubmit}
                                             disabled={isLoading || !isValid}
                                             className={`${(isLoading || !isValid) ? "opacity-75" : ""}`}
                                         >
-                                            {isLoading ? "Loading..." : "Create Account"}
+                                            {isLoading ? "Loading..." : "Save Changes"}
                                             {isLoading && <ActivityIndicator size="small" color="#ffffff" style={{ marginTop: 20, paddingHorizontal: 8 }} />}
                                         </Button>
+                                        <Button
+                                            variant="outline"
+                                        >
+                                            Reset Password
+                                        </Button>
+                                        <Button
+                                            className={`${(isLoading || !isValid) ? "opacity-75" : ""} border-destructive`}
+                                            variant="outline"
+                                            textClassName="text-destructive"
+                                        >
+                                            Logout
+                                        </Button>
                                         <View className="py-0.5" />
-                                        <Text className="mx-auto text-center self-center items-center">
-                                            Already have an account? <Link href="/login" className="text-primary">Login</Link>
-                                        </Text>
                                     </View>
                                 </>
                             )}

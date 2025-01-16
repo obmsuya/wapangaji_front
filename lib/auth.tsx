@@ -74,7 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             Toast.show({
                 type: "error",
                 text1: "Login Failed!",
-                text2: `${error ? error?.message : "Something went wrong. Please try again."}`
+                text2: `Something went wrong. Please try again.`
             });
         } finally {
             setIsLoading(false);
@@ -84,7 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const register = async (phone_number: string, full_name: string, password: string, language: string) => {
         setIsLoading(true);
         try {
-            const response = await api.post('/auth/register/', { phone_number, full_name, password, language });
+            const response = await api.post('auth/register/', { phone_number, full_name, password, language });
             const { access, refresh } = response.data;
 
             // Store tokens in state and AsyncStorage
@@ -95,17 +95,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             await AsyncStorage.setItem('accessToken', access);
             await AsyncStorage.setItem('refreshToken', refresh);
 
+            router.replace('(user)')
+
             Toast.show({
                 type: "success",
                 text1: "Login Successful!",
-                text2: "You have successfully logged in."
+                text2: "You have successfully registered in."
             });
-        } catch (error) {
+        } catch (error: any) {
             console.error('Login failed:', error);
             Toast.show({
                 type: "error",
                 text1: "Login Failed!",
-                text2: "Invalid email or password"
+                text2: error?.description ? error?.description : `Something went wrong. Please try again.`
             });
         } finally {
             setIsLoading(false);

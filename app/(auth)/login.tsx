@@ -67,7 +67,7 @@ export default function login() {
     }, [keyboard])
 
     return (
-        <SafeAreaView className="px-4 py-2 relative">
+        <SafeAreaView className="px-4 py-2 relative bg-white flex-1 w-full">
             <KeyboardAwareScrollView
                 enableOnAndroid={false}
                 enableAutomaticScroll={true}
