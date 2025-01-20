@@ -18,7 +18,6 @@ import { Formik } from "formik";
 import { useKeyboardVisibility } from "@/lib/useKeyboard";
 import { useAuth } from "@/lib/auth";
 
-import { Eye, EyeClosed } from "lucide-react-native";
 import { ActivityIndicator } from "react-native";
 
 const accountSchema = yup.object().shape({
@@ -89,7 +88,7 @@ export default function register() {
                         />
                     </Animated.View>
 
-                    <View className={keyboard ? "mt-4" : "mt-12"}>
+                    <View className={`${keyboard ? "mt-4" : "mt-12"} w-full`}>
                         <Formik
                             validationSchema={accountSchema}
                             initialValues={{
@@ -152,6 +151,7 @@ export default function register() {
                                         </Button>
                                         <Button
                                             variant="outline"
+                                            onPress={() => router.navigate("(user)/(account)/reset-password")}
                                         >
                                             Reset Password
                                         </Button>
@@ -175,5 +175,4 @@ export default function register() {
         </SafeAreaView>
     )
 }
-
 

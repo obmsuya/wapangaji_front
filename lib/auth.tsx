@@ -11,6 +11,7 @@ interface AuthContextType {
     refreshToken: string | null;
     login: (phone_number: string, password: string) => Promise<void>;
     register: (phone_number: string, full_name: string, password: string, language: string) => Promise<void>;
+    resetPassword: (phone_number: string, new_password: string, confirm_password: string) => Promise<void>;
     logout: () => Promise<void>;
     isAuthenticated: boolean;
     isLoading: boolean;
@@ -74,7 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             Toast.show({
                 type: "error",
                 text1: "Login Failed!",
-                text2: `Something went wrong. Please try again.`
+                text2: error.error ? error.error : `Something went wrong. Please try again.`
             });
         } finally {
             setIsLoading(false);
@@ -99,15 +100,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             Toast.show({
                 type: "success",
-                text1: "Login Successful!",
-                text2: "You have successfully registered in."
+                text1: "Registration Successful!",
+                text2: "Welcome to Wapangaji Kiganjani."
             });
         } catch (error: any) {
             console.error('Login failed:', error);
             Toast.show({
                 type: "error",
                 text1: "Login Failed!",
-                text2: error?.description ? error?.description : `Something went wrong. Please try again.`
+                text2: error?.error ? error?.error : `Something went wrong. Please try again.`
             });
         } finally {
             setIsLoading(false);
@@ -123,9 +124,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         router.push('/(auth)/');
     };
 
+    const resetPassword = async (phone_number: string, new_password: string, confirm_password: string) => {
+        setIsLoading(true);
+        try {
+            const response = await api.post('auth/password-reset/', { phone_number, new_password, confirm_password })
+            console.log(response)
+            Toast.show({
+                type: "success",
+                text1: "Password Reset Successful!",
+                text2: "You have successfully reset your password."
+            });
+        } catch (error: any) {
+            console.log("Failed to reset password", error)
+            Toast.show({
+                type: "error",
+                text1: "Login Failed!",
+                text2: error?.error ? error?.error : `Something went wrong. Please try again.`
+            });
+        }finally{
+            setIsLoading(false);
+        }
+    }
+
     return (
         <AuthContext.Provider
-            value={{ accessToken, refreshToken, login, register, logout, isAuthenticated, isLoading }}
+            value={{ accessToken, refreshToken, login, register, resetPassword, logout, isAuthenticated, isLoading }}
         >
             {children}
         </AuthContext.Provider>

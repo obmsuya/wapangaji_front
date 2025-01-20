@@ -5,6 +5,7 @@ import { Text } from "@/components/ui/Text";
 import { Eye, User2Icon, CircleHelp, CircleDollarSign, ChevronRight } from "lucide-react-native";
 import { useRouter } from "expo-router";
 
+
 export default function settings() {
     const router = useRouter();
 
@@ -36,20 +37,6 @@ export default function settings() {
                             <CircleDollarSign color="#ffffff" size={16} />
                         </View>
                         <Text className="text-xl">Subscription</Text>
-                    </View>
-                    <View>
-                        <ChevronRight color="#2B4B80" size={24} />
-                    </View>
-                </Pressable>
-                <Pressable
-                    onPress={() => router.push("/settings/reset-password")}
-                    className="flex-row py-2 justify-between items-center gap-4"
-                >
-                    <View className="flex-row items-center gap-4">
-                        <View className="bg-primary w-10 h-10 items-center justify-center rounded-full">
-                            <User2Icon color="#ffffff" size={16} />
-                        </View>
-                        <Text className="text-xl">Account</Text>
                     </View>
                     <View>
                         <ChevronRight color="#2B4B80" size={24} />
