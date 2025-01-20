@@ -35,7 +35,7 @@ const accountSchema = yup.object().shape({
 
 export default function register() {
     const router = useRouter()
-    const { isLoading } = useAuth()
+    const { isLoading, logout } = useAuth()
 
     const phoneNumberInputRef = useRef<TextInput>(null)
     const passwordInputRef = useRef<TextInput>(null)
@@ -159,6 +159,7 @@ export default function register() {
                                             className={`${(isLoading || !isValid) ? "opacity-75" : ""} border-destructive`}
                                             variant="outline"
                                             textClassName="text-destructive"
+                                            onPress={logout}
                                         >
                                             Logout
                                         </Button>

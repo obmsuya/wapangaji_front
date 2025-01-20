@@ -116,12 +116,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const logout = async () => {
-        await AsyncStorage.removeItem('accessToken');
-        await AsyncStorage.removeItem('refreshToken');
-        setAccessToken(null);
-        setRefreshToken(null);
-        setIsAuthenticated(false);
-        router.push('/(auth)/');
+        setIsLoading(true);
+        try{
+            await api.post("auth/logout/")
+            await AsyncStorage.removeItem('accessToken');
+            await AsyncStorage.removeItem('refreshToken');
+            setAccessToken(null);
+            setRefreshToken(null);
+            setIsAuthenticated(false);
+            router.push('/(auth)/');
+        } catch(error: any) {
+            await AsyncStorage.removeItem('accessToken');
+            await AsyncStorage.removeItem('refreshToken');
+            setAccessToken(null);
+            setRefreshToken(null);
+            setIsAuthenticated(false);
+            router.push('/(auth)/');
+        } finally {
+            setIsLoading(false)
+        }
     };
 
     const resetPassword = async (phone_number: string, new_password: string, confirm_password: string) => {

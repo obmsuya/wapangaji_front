@@ -1,12 +1,13 @@
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Pressable, View } from "react-native"
+import { Pressable, View, ActivityIndicator } from "react-native"
 import { Text } from "@/components/ui/Text";
 import { Eye, User2Icon, CircleHelp, CircleDollarSign, ChevronRight } from "lucide-react-native";
 import { useRouter } from "expo-router";
-
+import { useAuth } from "@/lib/auth";
 
 export default function settings() {
+    const { isLoading, logout } = useAuth()
     const router = useRouter();
 
     return (
@@ -58,17 +59,16 @@ export default function settings() {
                 </Pressable>
 
                 <Pressable
-                    onPress={() => router.push("/settings/faq")}
+                    onPress={logout}
                     className="flex-row py-2 justify-between items-center gap-4"
                 >
                     <View className="flex-row items-center gap-4">
                         <View className="bg-destructive w-10 h-10 items-center justify-center rounded-full">
-                            <CircleHelp color="#ffffff" size={16} />
+                            {
+                                !isLoading ? <CircleHelp color="#ffffff" size={16} /> : <ActivityIndicator color="#fff" />
+                            }
                         </View>
                         <Text className="text-xl text-destructive">Logout</Text>
-                    </View>
-                    <View>
-                        <ChevronRight color="#e63946" size={24} />
                     </View>
                 </Pressable>
             </View>
