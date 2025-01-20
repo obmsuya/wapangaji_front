@@ -30,7 +30,7 @@ export default function settings() {
                     </View>
                 </Pressable>
                 <Pressable
-                    onPress={() => router.push("/settings/subscription")}
+                    onPress={() => router.push("/(settings)/subscription")}
                     className="flex-row py-2 justify-between items-center gap-4"
                 >
                     <View className="flex-row items-center gap-4">

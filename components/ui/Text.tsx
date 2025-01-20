@@ -13,7 +13,7 @@ const textVariants = {
 
 interface Props extends TextProps {
     className?: string
-    variant?: string
+    variant?: "small" | "medium" | "large" | "huge"
 }
 
 export const Text: React.FunctionComponent<Props> = ({
