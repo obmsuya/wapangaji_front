@@ -1,14 +1,17 @@
 import { View, Pressable } from "react-native"
 import { Text } from "@/components/ui/Text"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { SafeAreaView } from "react-native-safe-area-context";
 import BackButton from "@/components/back-button";
 import { Check } from "lucide-react-native";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/RadioGroup"
 import { Image } from "expo-image"
+import { usePayment } from "@/lib/zustand";
+import { useAuth } from "@/lib/auth"
 
 export default function subscription() {
+  const { getSubscriptions } = usePayment()
   const [value, setValue] = React.useState('Standard Plan');
 
   const img = {
@@ -20,6 +23,10 @@ export default function subscription() {
       setValue(label);
     };
   }
+
+  useEffect(() => {
+    getSubscriptions()
+  }, [])
 
   return (
     <SafeAreaView className="flex-1 p-4 bg-white">

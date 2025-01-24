@@ -5,10 +5,20 @@ import api from './api';
 import { useRouter } from 'expo-router';
 import Toast from 'react-native-toast-message';
 
+export interface User {
+    id: number,
+    phone_number: string,
+    full_name: string,
+    language: string,
+    date_joined: Date,
+    last_login: any | null
+}
+
 // Define types for auth context
 interface AuthContextType {
-    accessToken: string | null;
-    refreshToken: string | null;
+    user: User | null
+    access: string | null;
+    refresh: string | null;
     login: (phone_number: string, password: string) => Promise<void>;
     register: (phone_number: string, full_name: string, password: string, language: string) => Promise<void>;
     resetPassword: (phone_number: string, new_password: string, confirm_password: string) => Promise<void>;
@@ -20,8 +30,9 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [accessToken, setAccessToken] = useState<string | null>(null);
-    const [refreshToken, setRefreshToken] = useState<string | null>(null);
+    const [user, setUser] = useState<User | null>(null)
+    const [access, setAccess] = useState<string | null>(null);
+    const [refresh, setRefresh] = useState<string | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -30,14 +41,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Load tokens from AsyncStorage on app start
     useEffect(() => {
         const loadStoredTokens = async () => {
-            const [storedAccessToken, storedRefreshToken] = await Promise.all([
-                AsyncStorage.getItem('accessToken'),
-                AsyncStorage.getItem('refreshToken'),
+            const [access, refresh] = await Promise.all([
+                AsyncStorage.getItem('access'),
+                AsyncStorage.getItem('refresh'),
             ]);
 
-            if (storedAccessToken && storedRefreshToken) {
-                setAccessToken(storedAccessToken);
-                setRefreshToken(storedRefreshToken);
+            if (access && refresh) {
+                setAccess(access);
+                setRefresh(refresh);
                 setIsAuthenticated(true);
             }
         };
@@ -51,17 +62,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const response = await api.post('auth/login/', { phone_number, password });
             const res = response.data;
 
-            console.log(res);
             const { access, refresh } = response.data;
+            console.log(access);
 
             // Store tokens in state and AsyncStorage
-            setAccessToken(access);
-            setRefreshToken(refresh);
+            setAccess(access);
+            setRefresh(refresh);
             setIsAuthenticated(true);
 
 
-            await AsyncStorage.setItem('accessToken', access);
-            await AsyncStorage.setItem('refreshToken', refresh);
+            await AsyncStorage.setItem('access', access);
+            await AsyncStorage.setItem('refresh', refresh);
 
             router.replace('(user)')
 
@@ -70,6 +81,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 text1: "Login Successful!",
                 text2: "You have successfully logged in."
             });
+
+            // const user = await api.get('auth/me/');
+            // console.log(user.data);
+            
+
         } catch (error: any) {
             console.error('Login failed:', error);
             Toast.show({
@@ -89,14 +105,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const { access, refresh } = response.data;
 
             // Store tokens in state and AsyncStorage
-            setAccessToken(accessToken);
-            setRefreshToken(refreshToken);
+            setAccess(access);
+            setRefresh(refresh);
             setIsAuthenticated(true);
 
-            await AsyncStorage.setItem('accessToken', access);
-            await AsyncStorage.setItem('refreshToken', refresh);
+            await AsyncStorage.setItem('access', access);
+            await AsyncStorage.setItem('refresh', refresh);
 
             router.replace('(user)')
+
+            await getUser(access)
 
             Toast.show({
                 type: "success",
@@ -117,21 +135,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const logout = async () => {
         setIsLoading(true);
-        try{
+        try {
             await api.post("auth/logout/")
-            await AsyncStorage.removeItem('accessToken');
-            await AsyncStorage.removeItem('refreshToken');
-            setAccessToken(null);
-            setRefreshToken(null);
+            await AsyncStorage.removeItem('access');
+            await AsyncStorage.removeItem('refresh');
+            setAccess(null);
+            setRefresh(null);
             setIsAuthenticated(false);
+            setUser(null)
             router.push('/(auth)/');
-        } catch(error: any) {
-            await AsyncStorage.removeItem('accessToken');
-            await AsyncStorage.removeItem('refreshToken');
-            setAccessToken(null);
-            setRefreshToken(null);
+        } catch (error: any) {
+            await AsyncStorage.removeItem('access');
+            await AsyncStorage.removeItem('refresh');
+            setAccess(null);
+            setRefresh(null);
             setIsAuthenticated(false);
+            setUser(null)
             router.push('/(auth)/');
+            console.log(error)
         } finally {
             setIsLoading(false)
         }
@@ -154,14 +175,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 text1: "Login Failed!",
                 text2: error?.error ? error?.error : `Something went wrong. Please try again.`
             });
-        }finally{
+        } finally {
             setIsLoading(false);
+        }
+    }
+
+    const getUser = async (token: string) => {
+        setIsLoading(true)
+        try {
+
+            console.log(token);
+            
+        } catch (error: any) {
+            console.log(error);
+        } finally {
+            setIsLoading(false)
         }
     }
 
     return (
         <AuthContext.Provider
-            value={{ accessToken, refreshToken, login, register, resetPassword, logout, isAuthenticated, isLoading }}
+            value={{ access, refresh, login, register, resetPassword, logout, isAuthenticated, isLoading, user }}
         >
             {children}
         </AuthContext.Provider>

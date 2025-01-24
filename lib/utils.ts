@@ -6,4 +6,4 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const base_url = `http://${Constants.expoConfig?.hostUri?.split(':').shift()?.concat(':8000')}`;
+export const base_url = `https://ca81-41-220-132-172.ngrok-free.app`;

@@ -75,7 +75,7 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
                 "flex-row gap-2"
             )}
             android_ripple={{
-                color: "#919191",
+                color: "#0000001c",
                 borderless: false,
                 foreground: true
             }}

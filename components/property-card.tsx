@@ -1,23 +1,14 @@
 import React from "react";
 
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/Dialog";
-
-import { Pressable, View } from "react-native"
+import { Pressable, View, Modal } from "react-native"
 import { Text } from "./ui/Text";
 import { Button } from "./ui/Button";
-import { Trash2 } from "lucide-react-native";
+import { Trash2, X } from "lucide-react-native";
 import { useRouter } from "expo-router";
+import BackButton from "./back-button";
 
 const PropertyCard = () => {
+    const [modalVisible, setModalVisible] = React.useState(false);
     const router = useRouter();
 
     return (
@@ -61,42 +52,55 @@ const PropertyCard = () => {
                     </View>
                 </View>
             </Pressable>
-            <View>
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button
-                            className="bg-destructive rounded-full items-center justify-center p-4"
-                            style={{
-                                width: 40,
-                                height: 40,
-                                alignSelf: "flex-end"
-                            }}
-                        >
-                            <Trash2 color="#ffffff" size={20} />
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle className="text-xl">Delete Property</DialogTitle>
-                            <DialogDescription>
-                                Are you sure you want to delete this property?
-                            </DialogDescription>
-                        </DialogHeader>
-                        <DialogFooter className="flex flex-row space-y-4 justify-end">
-                            <DialogClose asChild>
+
+            <Pressable
+                className="w-10 h-10 border rounded-full bg-destructive flex items-center justify-between"
+                onPress={() => setModalVisible(true)}
+            >
+                <Trash2 color="#fff" size={16} />
+            </Pressable>
+
+            <Modal
+                transparent={true}
+                visible={modalVisible}
+                animationType="fade"
+                onRequestClose={() => {
+                    setModalVisible(!modalVisible);
+                }}
+            >
+                <View className="flex-1 justify-center items-center bg-black/30 p-8">
+                    <View className="bg-white w-full rounded-xl p-4 relative max-w-96">
+                        <Pressable className="self-end mb-4" onPress={() => setModalVisible(false)}>
+                            <X color="#000" size={16} />
+                        </Pressable>
+
+
+                        <View className="gap-4">
+                            <View className="gap-1 flex flex-col">
+                                <Text className="text-center font-bold" variant="large">Delete Property</Text>
+                                <Text className="text-center">Are you sure you want to delete this property</Text>
+                            </View>
+
+                            <View className="gap-2 mt-2">
                                 <Button
-                                    className="bg-transparent border border-accent-foreground"
-                                    textClassName="text-accent-foreground"
+                                    className="w-full gap-4 flex-row items-center justify-center"
+                                    variant="destructive"
+                                >
+                                    Delete
+                                </Button>
+                                <Button
+                                    className="w-full"
+                                    variant="ghost"
+                                    onPress={() => setModalVisible(false)}
                                 >
                                     Cancel
                                 </Button>
-                            </DialogClose>
-                            <Button className="bg-destructive text-sm">
-                                    Delete
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+            <View>
             </View>
         </View>
     )

@@ -1,23 +1,27 @@
-// /utils/api.ts
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useAuth } from "./auth";
+import { router } from "expo-router";
 import { base_url } from "./utils";
-import { useRouter } from "expo-router";
-
-const router = useRouter();
 
 const api = axios.create({
   baseURL: `${base_url}/api/v1/`,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
-api.interceptors.request.use(async (config) => {
-  const token = await AsyncStorage.getItem("accessToken");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(
+  async (config) => {
+    const access = await AsyncStorage.getItem("access");
+    if (access) {
+      config.headers["Authorization"] = `Bearer ${access}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
 api.interceptors.response.use(
   (response) => response,
@@ -26,26 +30,33 @@ api.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
+
       try {
-        const refreshToken = await AsyncStorage.getItem("refreshToken");
-        if (!refreshToken) throw new Error("No refresh token");
+        const refresh = await AsyncStorage.getItem("refresh");
 
-        const response = await axios.post(`${base_url}/api/v1/auth/token/refresh/`, {
-          refreshToken,
-        });
+        if (!refresh) {
+          // Clear stored tokens since refresh token is missing
+          await AsyncStorage.multiRemove(["access", "refresh"]);
+          return Promise.reject(error);
+        }
 
-        const { accessToken, refreshToken: newRefreshToken } = response.data;
+        const response = await axios.post(
+          `${base_url}/api/v1/auth/token/refresh/`,
+          refresh
+        );
 
-        await AsyncStorage.setItem("accessToken", accessToken);
-        await AsyncStorage.setItem("refreshToken", newRefreshToken);
+        const { access: newAccess, refresh: newRefresh } = response.data;
 
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        await AsyncStorage.setItem("access", newAccess);
+        await AsyncStorage.setItem("refresh", newRefresh);
+
+        // Update the failed request with new token and retry
+        originalRequest.headers["Authorization"] = `Bearer ${newAccess}`;
         return api(originalRequest);
       } catch (refreshError) {
-        console.error("Failed to refresh token:", refreshError);
-        await AsyncStorage.removeItem("accessToken");
-        await AsyncStorage.removeItem("refreshToken");
-        router.push('/(auth)/login');
+        // Clear tokens on refresh failure
+        await AsyncStorage.multiRemove(["access", "refresh"]);
+        router.push("/(auth)/login");
         return Promise.reject(refreshError);
       }
     }

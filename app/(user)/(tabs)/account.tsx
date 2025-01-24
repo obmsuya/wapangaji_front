@@ -16,7 +16,8 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import * as yup from "yup"
 import { Formik } from "formik";
 import { useKeyboardVisibility } from "@/lib/useKeyboard";
-import { useAuth } from "@/lib/auth";
+import { useAuth, type User } from "@/lib/auth";
+import api from "@/lib/api"
 
 import { ActivityIndicator } from "react-native";
 
@@ -35,7 +36,7 @@ const accountSchema = yup.object().shape({
 
 export default function register() {
     const router = useRouter()
-    const { isLoading, logout } = useAuth()
+    const { isLoading, logout, user, access } = useAuth()
 
     const phoneNumberInputRef = useRef<TextInput>(null)
     const passwordInputRef = useRef<TextInput>(null)
@@ -53,6 +54,8 @@ export default function register() {
         } else if (!keyboard) {
             scale.value = withSpring(1)
         }
+
+
     }, [keyboard])
 
     return (
