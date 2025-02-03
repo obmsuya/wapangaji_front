@@ -84,7 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             // const user = await api.get('auth/me/');
             // console.log(user.data);
-            
+            getUser()
 
         } catch (error: any) {
             console.error('Login failed:', error);
@@ -114,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             router.replace('(user)')
 
-            await getUser(access)
+            await getUser()
 
             Toast.show({
                 type: "success",
@@ -180,12 +180,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }
 
-    const getUser = async (token: string) => {
+    const getUser = async () => {
         setIsLoading(true)
         try {
-
-            console.log(token);
-            
+            const res: User = await api.get("auth/me/")
+            setUser(res?.data)
         } catch (error: any) {
             console.log(error);
         } finally {

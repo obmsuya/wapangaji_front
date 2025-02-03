@@ -55,6 +55,7 @@ export default function register() {
             scale.value = withSpring(1)
         }
 
+        console.log(access)
 
     }, [keyboard])
 
@@ -71,7 +72,6 @@ export default function register() {
             >
 
                 <View className={keyboard ? "mt-0" : "mt-[12.5%]"}>
-                    <Text className={`text-center text-4xl font-bold ${keyboard ? "mb-4" : "mb-12"}`}>Your Account</Text>
                     <Animated.View
                         style={{
                             transform: [{
@@ -91,88 +91,29 @@ export default function register() {
                         />
                     </Animated.View>
 
-                    <View className={`${keyboard ? "mt-4" : "mt-12"} w-full`}>
-                        <Formik
-                            validationSchema={accountSchema}
-                            initialValues={{
-                                phone_number: "",
-                                full_name: "",
-                                password: ""
-                            }}
-                            onSubmit={values => {
-                                console.log(values.phone_number, values.full_name, values.password, "en")
-                            }}
-                        >
-                            {({ handleChange, handleSubmit, errors, isValid, values }) => (
-                                <>
+                    <View className="w-full">
+                        <View className="gap-2 mt-4">
+                            <Text className="text-center text-3xl">{user?.full_name}</Text>
+                            <Text className="text-center text-xl">{user?.phone_number}</Text>
+                        </View>
 
-                                    <View className="flex flex-col gap-2">
-                                        <View className="gap-2">
-                                            <Text className={errors.full_name ? "text-destructive" : ""}>
-                                                {errors.full_name ? errors.full_name : "Your full name"}
-                                            </Text>
-                                            <Input
-                                                placeholder="Enter your full name"
-                                                onChangeText={handleChange('full_name')}
-                                                value={values.full_name}
-                                                returnKeyType="next"
-                                                className={errors.full_name ? "bg-destructive/10 border-destructive border-2 text-destructive" : ""}
-                                                onSubmitEditing={() => phoneNumberInputRef.current?.focus()}
-                                                placeholderClassName={errors.full_name ? "text-destructive" : ""}
-                                                autoCapitalize="words"
-                                                autoCorrect={false}
-                                            />
-                                        </View>
-                                        <View className="gap-2">
-                                            <Text className={errors.phone_number ? "text-destructive" : ""}>
-                                                {errors.phone_number ? errors.phone_number : "Mobile Number"}
-                                            </Text>
-                                            <Input
-                                                placeholder="Enter your mobile number"
-                                                onChangeText={handleChange('phone_number')}
-                                                ref={phoneNumberInputRef}
-                                                value={values.phone_number}
-                                                returnKeyType="next"
-                                                inputMode="tel"
-                                                onSubmitEditing={() => passwordInputRef?.current?.focus()}
-                                                className={
-                                                    errors.phone_number ?
-                                                        "bg-destructive/10 border-destructive border-2 text-destructive p-3"
-                                                        : "text-black border-0"
-                                                }
-                                                placeholderClassName={errors.phone_number ? "text-destructive" : ""}
-                                            />
-                                        </View>
-                                        <View className="py-2" />
-                                        <Button
-                                            onPress={handleSubmit}
-                                            disabled={isLoading || !isValid}
-                                            className={`${(isLoading || !isValid) ? "opacity-75" : ""}`}
-                                        >
-                                            {isLoading ? "Loading..." : "Save Changes"}
-                                            {isLoading && <ActivityIndicator size="small" color="#ffffff" style={{ marginTop: 20, paddingHorizontal: 8 }} />}
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            onPress={() => router.navigate("(user)/(account)/reset-password")}
-                                        >
-                                            Reset Password
-                                        </Button>
-                                        <Button
-                                            className={`${(isLoading || !isValid) ? "opacity-75" : ""} border-destructive`}
-                                            variant="outline"
-                                            textClassName="text-destructive"
-                                            onPress={logout}
-                                        >
-                                            Logout
-                                        </Button>
-                                        <View className="py-0.5" />
-                                    </View>
-                                </>
-                            )}
-                        </Formik>
+                        <View className="mt-8 gap-2">
+                            <Button
+                                variant="outline"
+                                onPress={() => router.navigate("(user)/(account)/reset-password")}
+                            >
+                                Reset Password
+                            </Button>
+                            <Button
+                                className={`${isLoading ? "opacity-75" : ""} border-destructive`}
+                                variant="outline"
+                                textClassName="text-destructive"
+                                onPress={logout}
+                            >
+                                Logout
+                            </Button>
+                        </View>
                     </View>
-
                 </View>
 
             </KeyboardAwareScrollView>
