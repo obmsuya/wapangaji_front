@@ -58,16 +58,28 @@ export default function login() {
         uri: require("@/assets/images/illustrations/login.svg")
     }
 
-    useEffect(() => {
+    const showKeyboard = () => {
         if (keyboard) {
             scale.value = withSpring(0.8)
         } else if (!keyboard) {
             scale.value = withSpring(1)
         }
+    }
+
+    useEffect(() => {
+        showKeyboard()
     }, [keyboard])
 
     return (
-        <SafeAreaView className="px-4 py-2 relative bg-white flex-1 w-full">
+        <SafeAreaView className="px-[20%] py-2 relative bg-white flex-1 w-full justify-center">
+            <Button className="bg-primary w-10 h-10 rounded-full p-2 items-center justify-center"
+                android_ripple={{
+                    color: "#ffffff"
+                }}
+                onPress={() => router.back()}
+            >
+                <ArrowLeft size={24} color="#fff" className="self-center" />
+            </Button>
             <KeyboardAwareScrollView
                 enableOnAndroid={false}
                 enableAutomaticScroll={true}
@@ -75,15 +87,8 @@ export default function login() {
                 showsVerticalScrollIndicator={false}
                 keyboardOpeningTime={0}
                 keyboardShouldPersistTaps="handled"
+                contentContainerClassName="w-full relative bg-white flex-1 w-full justify-center mb-20"
             >
-                <Button className="bg-primary w-10 h-10 rounded-full p-2 items-center justify-center"
-                    android_ripple={{
-                        color: "#ffffff"
-                    }}
-                    onPress={() => router.back()}
-                >
-                    <ArrowLeft size={24} color="#fff" className="self-center" />
-                </Button>
                 <View
                     className={keyboard ? "mt-[10%]" : "mt-[12.5%]"}
 
