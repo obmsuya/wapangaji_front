@@ -124,7 +124,7 @@ export default function register() {
                                 password: ""
                             }}
                             onSubmit={values => {
-                                register(values.phone_number, values.full_name, values.password, "en")
+                                register(values.phone_number, values.full_name, values.password)
                             }}
                         >
                             {({ handleChange, handleSubmit, errors, isValid, values }) => (

@@ -20,7 +20,7 @@ interface AuthContextType {
     access: string | null;
     refresh: string | null;
     login: (phone_number: string, password: string) => Promise<void>;
-    register: (phone_number: string, full_name: string, password: string, language: string) => Promise<void>;
+    register: (phone_number: string, full_name: string, password: string) => Promise<void>;
     resetPassword: (phone_number: string, new_password: string, confirm_password: string) => Promise<void>;
     logout: () => Promise<void>;
     isAuthenticated: boolean;
@@ -60,7 +60,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsLoading(true);
         try {
             const response = await api.post('auth/login/', { phone_number, password });
-            const res = response.data;
 
             const { access, refresh } = response.data;
             console.log(access);
@@ -82,26 +81,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 text2: "You have successfully logged in."
             });
 
-            // const user = await api.get('auth/me/');
-            // console.log(user.data);
             getUser()
 
         } catch (error: any) {
-            console.error('Login failed:', error);
+            console.error('Login failed:', error.status);
             Toast.show({
                 type: "error",
                 text1: "Login Failed!",
-                text2: error.error ? error.error : `Something went wrong. Please try again.`
+                text2: `${error.response.data.error ?? "Something went wrong" }`
             });
         } finally {
             setIsLoading(false);
         }
     };
 
-    const register = async (phone_number: string, full_name: string, password: string, language: string) => {
+    const register = async (phone_number: string, full_name: string, password: string) => {
         setIsLoading(true);
         try {
-            const response = await api.post('auth/register/', { phone_number, full_name, password, language });
+            const response = await api.post('auth/register/', { phone_number, full_name, password });
             const { access, refresh } = response.data;
 
             // Store tokens in state and AsyncStorage
@@ -114,19 +111,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             router.replace('(user)')
 
-            await getUser()
-
             Toast.show({
                 type: "success",
                 text1: "Registration Successful!",
                 text2: "Welcome to Wapangaji Kiganjani."
             });
+            await getUser()
         } catch (error: any) {
-            console.error('Login failed:', error);
+            console.log('Registration failed:', error.response.data.error);
             Toast.show({
                 type: "error",
-                text1: "Login Failed!",
-                text2: error?.error ? error?.error : `Something went wrong. Please try again.`
+                text1: "Registration Failed!",
+                text2: `${error.response.data.error ?? "Something went wrong" }`
             });
         } finally {
             setIsLoading(false);
@@ -172,7 +168,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.log("Failed to reset password", error)
             Toast.show({
                 type: "error",
-                text1: "Login Failed!",
+                text1: "Failed to reset password",
                 text2: error?.error ? error?.error : `Something went wrong. Please try again.`
             });
         } finally {
@@ -183,7 +179,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const getUser = async () => {
         setIsLoading(true)
         try {
-            const res: User = await api.get("auth/me/")
+            const res: User | any = await api.get("auth/me/")
             setUser(res?.data)
         } catch (error: any) {
             console.log(error);
