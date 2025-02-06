@@ -81,10 +81,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 text2: "You have successfully logged in."
             });
 
-            getUser()
+            await getUser()
 
         } catch (error: any) {
-            console.error('Login failed:', error.status);
+            console.error('Login failed:', error.response.data);
             Toast.show({
                 type: "error",
                 text1: "Login Failed!",

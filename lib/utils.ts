@@ -6,4 +6,4 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const base_url = `https://8614-41-220-132-172.ngrok-free.app`;
+export const base_url = `https://e05b-41-220-132-172.ngrok-free.app`;
