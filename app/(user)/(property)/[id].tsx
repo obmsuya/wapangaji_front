@@ -71,7 +71,7 @@ const PropertyDetails = () => {
                             </TabsTrigger>
                         </TabsList>
                         <TabsContent value='properties'>
-                            <Text>Make changes to your account here. Click save when you're done.</Text>
+                            <Text>Property Layout will appear here.</Text>
                         </TabsContent>
             
                         <TabsContent value='tenants'>
