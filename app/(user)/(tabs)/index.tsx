@@ -13,8 +13,6 @@ import { FlashList } from "@shopify/flash-list";
 export default function index() {
   const router = useRouter();
 
-  const { isAuthenticated } = useAuth()
-
   return (
     <ScrollView
       className="flex-1 p-4"
@@ -52,7 +50,7 @@ export default function index() {
         </View>
 
         {
-          [1, 2, 3, 4, 5, 6, 7, 8, 9].map(_ => <PropertyCard />)
+          [1, 2, 3, 4, 5, 6, 7, 8, 9].map(index => <PropertyCard key={index} id={index} />)
         }
       </SafeAreaView>
     </ScrollView>

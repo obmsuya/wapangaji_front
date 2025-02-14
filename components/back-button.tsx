@@ -10,11 +10,12 @@ export default function BackButton() {
                 color: "#ffffff",
             }}
             style={{
-                alignItems: "center"
+                alignItems: "center",
+                justifyContent: "center",
             }}
             onPress={() => router.back()}
         >
-            <ArrowLeft size={24} color="#fff" className="self-center" />
+            <ArrowLeft size={20} color="#fff" style={{alignSelf: "center"}} />
         </Button>
     );
 }

@@ -5,6 +5,7 @@ import { View, StyleSheet } from "react-native"
 import { Image, ImageBackground } from "expo-image";
 import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Text";
+import { StatusBar } from "expo-status-bar";
 
 export default function Welcome() {
     const router = useRouter()

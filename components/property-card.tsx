@@ -1,18 +1,29 @@
 import React from "react";
 
 import { Pressable, View, Modal } from "react-native"
+import { Image } from "expo-image"
+
 import { Text } from "./ui/Text";
 import { Button } from "./ui/Button";
 import { Trash2, X } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import BackButton from "./back-button";
 
-const PropertyCard = () => {
+interface Props {
+    id: number;
+}
+
+const PropertyCard: React.FC<Props> = ({ id }) => {
     const [modalVisible, setModalVisible] = React.useState(false);
     const router = useRouter();
 
+    const img = {
+        uri: require("@/assets/images/example-home.jpg")
+    }
+
     return (
-        <View
+        <Pressable
+            key={id}
             style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -24,10 +35,15 @@ const PropertyCard = () => {
                 style={{
                     flexDirection: "row",
                     gap: 16,
-                    alignItems: "center"
+                    alignItems: "center",
+                    justifyContent: "center"
                 }}
+                onPress={() => router.navigate({
+                    pathname: '(user)/(property)/[id]',
+                    params: { id: id },
+                })}
             >
-                <View
+                <Image
                     style={{
                         backgroundColor: "#c7c7c7",
                         height: 80,
@@ -36,10 +52,12 @@ const PropertyCard = () => {
                         marginBottom: 8,
                         borderRadius: 16
                     }}
+                    source={img.uri}
+                    contentFit="cover"
                 />
                 <View>
                     <Text className="text-lg font-semibold text-primary">Apartment</Text>
-                    <Text className="text-xl max-w-60 line-clamp-1">Sinza Apartment Flat no. 01</Text>
+                    <Text className="text-xl max-w-60 line-clamp-1">Sinza Apartment Flat no. {id}</Text>
 
                     <View style={{
                         flexDirection: "row",
@@ -49,15 +67,23 @@ const PropertyCard = () => {
                     }}>
                         <Text className="text-sm text-primary">Rooms: 7</Text>
                         <Text className="text-sm text-primary">Tenants: 2</Text>
-                    </View>
+                        </View>
                 </View>
             </Pressable>
 
             <Pressable
-                className="w-10 h-10 border rounded-full bg-destructive flex items-center justify-between"
+                className="w-10 h-10 rounded-full bg-destructive flex items-center justify-center ml-14"
                 onPress={() => setModalVisible(true)}
             >
-                <Trash2 color="#fff" size={16} />
+                <Trash2
+                    color="#fff"
+                    size={16}
+                    style={{
+                        justifyContent: "center",
+                        alignItems: "center",
+                        alignSelf: "center"
+                    }}
+                />
             </Pressable>
 
             <Modal
@@ -102,7 +128,7 @@ const PropertyCard = () => {
             </Modal>
             <View>
             </View>
-        </View>
+        </Pressable>
     )
 }
 

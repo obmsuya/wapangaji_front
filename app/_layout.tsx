@@ -4,6 +4,8 @@ import { AuthProvider } from "@/lib/auth"
 
 import { View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 import { useFonts } from "expo-font";
 import * as SplashScreen from 'expo-splash-screen';
@@ -32,20 +34,24 @@ export default function RootLayout() {
     }
 
     return (
-        <AuthProvider>
-            <SafeAreaProvider>
-                <View
-                    className="flex-1"
-                    style={{
-                        backgroundColor: "#fff",
-                    }}
-                >
-                    <Slot />
-                    <StatusBar style="auto" />
-                    <Toast config={toastConfig} />
-                </View>
-                <PortalHost />
-            </SafeAreaProvider>
-        </AuthProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <BottomSheetModalProvider>
+                <AuthProvider>
+                    <SafeAreaProvider>
+                        <View
+                            className="flex-1"
+                            style={{
+                                backgroundColor: "#fff",
+                            }}
+                        >
+                            <Slot />
+                            <StatusBar style="auto" />
+                            <Toast config={toastConfig} />
+                        </View>
+                        <PortalHost />
+                    </SafeAreaProvider>
+                </AuthProvider>
+            </BottomSheetModalProvider>
+        </GestureHandlerRootView>
     )
 }

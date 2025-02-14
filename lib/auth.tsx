@@ -88,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             Toast.show({
                 type: "error",
                 text1: "Login Failed!",
-                text2: `${error.response.data.error ?? "Something went wrong" }`
+                text2: `${error.response.data.error ?? error.response.data.phone_number ?? "Something went wrong" }`
             });
         } finally {
             setIsLoading(false);
