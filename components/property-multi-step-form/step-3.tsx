@@ -2,7 +2,8 @@ import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Button } from '../ui/Button'
 import SlideTransition from '../slide-transition'
-import {Text} from "@/components/ui/Text"
+import { Text } from "@/components/ui/Text"
+import FloorPlanDetails from '../new-property/floor-plan'
 
 interface props {
     step: number
@@ -13,7 +14,7 @@ interface props {
 const StepThree: React.FunctionComponent<props> = ({ step, nextStep, prevStep }) => {
     return (
         <View className="border flex-1 justify-center items-center">
-            <Text variant="huge">SVG MAP MAKER HERE</Text>
+            <FloorPlanDetails />
             <View className="flex-row">
                 <Button
                     onPress={() => prevStep(step)}

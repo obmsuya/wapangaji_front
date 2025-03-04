@@ -15,7 +15,7 @@ export default function BackButton() {
             }}
             onPress={() => router.back()}
         >
-            <ArrowLeft size={20} color="#fff" style={{alignSelf: "center"}} />
+            <ArrowLeft size={16} color="#fff" style={{alignSelf: "center", justifyContent: "center", alignItems: "center"}} />
         </Button>
     );
 }

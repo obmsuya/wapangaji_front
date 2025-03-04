@@ -16,7 +16,7 @@ export default function settings() {
 
             <View>
                 <Pressable
-                    onPress={() => router.push("/settings/preference")}
+                    onPress={() => router.push("/(settings)/preference")}
                     className="flex-row py-2 justify-between items-center gap-4"
                 >
                     <View className="flex-row items-center gap-4">
@@ -44,7 +44,7 @@ export default function settings() {
                     </View>
                 </Pressable>
                 <Pressable
-                    onPress={() => router.push("/settings/faq")}
+                    onPress={() => router.push("/(settings)/faq")}
                     className="flex-row py-2 justify-between items-center gap-4"
                 >
                     <View className="flex-row items-center gap-4">
