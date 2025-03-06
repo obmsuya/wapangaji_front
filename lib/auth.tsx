@@ -88,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             Toast.show({
                 type: "error",
                 text1: "Login Failed!",
-                text2: `${error.response.data.error ?? error.response.data.phone_number ?? "Something went wrong" }`
+                text2: `${error.response.data.error ?? error.response.data.phone_number ?? "Something went wrong"}`
             });
         } finally {
             setIsLoading(false);
@@ -98,16 +98,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const register = async (phone_number: string, full_name: string, password: string) => {
         setIsLoading(true);
         try {
-            // const response = await api.post('auth/register/', { phone_number, full_name, password });
-            // const { access, refresh } = response.data;
+            const response = await api.post('auth/register/', { phone_number, full_name, password });
+            const { access, refresh } = response.data;
 
-            // // Store tokens in state and AsyncStorage
-            // setAccess(access);
-            // setRefresh(refresh);
-            // setIsAuthenticated(true);
+            // Store tokens in state and AsyncStorage
+            setAccess(access);
+            setRefresh(refresh);
+            setIsAuthenticated(true);
 
-            // await AsyncStorage.setItem('access', access);
-            // await AsyncStorage.setItem('refresh', refresh);
+            await AsyncStorage.setItem('access', access);
+            await AsyncStorage.setItem('refresh', refresh);
 
             router.replace('(user)/(property)/add-property')
 
@@ -116,13 +116,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 text1: "Registration Successful!",
                 text2: "Welcome to Wapangaji Kiganjani."
             });
+
             await getUser()
         } catch (error: any) {
             console.log('Registration failed:', error.response.data.error);
             Toast.show({
                 type: "error",
                 text1: "Registration Failed!",
-                text2: `${error.response.data.error ?? "Something went wrong" }`
+                text2: `${error.response.data.error ?? "Something went wrong"}`
             });
         } finally {
             setIsLoading(false);
