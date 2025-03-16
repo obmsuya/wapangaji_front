@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity, Alert, ScrollView } from "react-native";
 import Svg, { Rect } from "react-native-svg";
-import { useNavigation } from "expo-router";
 import { Button } from "../ui/Button";
 import { Text } from "../ui/Text";
-import { useFloorPlanStore } from "@/lib/zustand";
+import { usePropertyStore } from "@/lib/zustand";
 
 const GRID_SIZE = 8;
 const CELL_SIZE = 40;
 
 const FloorPlanDetails: React.FC = () => {
-  const navigation = useNavigation();
   const {
     selectedUnits,
     addUnit,
     removeUnit,
     currentFloor,
-    totalFloors,
+    propertyDetails,
+    floorPlans,
+    saveFloorPlan,
     incrementFloor,
-    saveFloorPlan
-  } = useFloorPlanStore();
+    setCurrentFloor
+  } = usePropertyStore();
 
   const handleUnitSelection = (id: number) => {
     if (selectedUnits.includes(id)) {
@@ -50,23 +50,42 @@ const FloorPlanDetails: React.FC = () => {
       };
 
       saveFloorPlan(floorPlanDetails);
-      console.log("Floor Plan Saved");
-    //   navigation.navigate('UnitDetails', { 
-    //     unitId: selectedUnits[0],
-    //     floor: currentFloor 
-    //   });
+      console.log("Floor Plan Saved for floor", currentFloor);
     } catch (e) {
       console.error(e);
     }
   };
 
   const addFloor = () => {
-    if (currentFloor < totalFloors) {
+    if (currentFloor < propertyDetails.totalFloors) {
+      // Save current floor before moving to next
+      saveFloorPlanUnits();
       incrementFloor();
     } else {
       Alert.alert("Error", "Cannot add more floors than building allows");
     }
   };
+
+  const handleFloorChange = (floor: number) => {
+    if (floor >= 1 && floor <= propertyDetails.totalFloors) {
+      // Save current floor before changing
+      saveFloorPlanUnits();
+      setCurrentFloor(floor);
+    }
+  };
+
+  // Load existing floor plan when floor changes
+  useEffect(() => {
+    // If we have data for this floor, load the selected units
+    if (floorPlans[currentFloor]) {
+      // Clear existing selections to avoid duplicates
+      floorPlans[currentFloor].units.forEach(unit => {
+        if (!selectedUnits.includes(unit.unitId)) {
+          addUnit(unit.unitId);
+        }
+      });
+    }
+  }, [currentFloor]);
 
   return (
     <ScrollView contentContainerStyle={{ padding: 20, alignItems: "center" }}>
@@ -74,6 +93,10 @@ const FloorPlanDetails: React.FC = () => {
       <Text style={{ textAlign: "center", marginVertical: 10 }}>
         Draw the units plans per floor. A box represents one unit on a floor.
       </Text>
+      
+      <View style={{ flexDirection: 'row', marginVertical: 10 }}>
+        <Text>Current Floor: {currentFloor} of {propertyDetails.totalFloors}</Text>
+      </View>
 
       <Svg width={GRID_SIZE * CELL_SIZE} height={GRID_SIZE * CELL_SIZE}>
         {[...Array(GRID_SIZE * GRID_SIZE)].map((_, index) => {
@@ -97,8 +120,28 @@ const FloorPlanDetails: React.FC = () => {
         })}
       </Svg>
 
-      <Button onPress={saveFloorPlanUnits}>Save Floor (next page)</Button>
-      <Button onPress={addFloor}>Add Floor</Button>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', marginTop: 20 }}>
+        <Button 
+          onPress={() => handleFloorChange(currentFloor - 1)}
+          disabled={currentFloor <= 1}
+        >
+          Previous Floor
+        </Button>
+        
+        <Button 
+          onPress={() => handleFloorChange(currentFloor + 1)}
+          disabled={currentFloor >= propertyDetails.totalFloors}
+        >
+          Next Floor
+        </Button>
+      </View>
+
+      <Button 
+        onPress={saveFloorPlanUnits}
+        style={{ marginTop: 10 }}
+      >
+        Save Floor Plan
+      </Button>
     </ScrollView>
   );
 };

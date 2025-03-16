@@ -10,15 +10,29 @@ import { useRouter } from "expo-router";
 import BackButton from "./back-button";
 
 interface Props {
-    id: number;
+    id: string;
+    name?: string;
+    location?: string;
+    type?: string;
+    image?: string;
+    total_floors?: number;
+    rooms?: number;
+    tenants?: number;
 }
 
-const PropertyCard: React.FC<Props> = ({ id }) => {
+const PropertyCard: React.FC<Props> = ({ 
+    id, 
+    name = "Sinza Apartment", 
+    type = "Apartment", 
+    rooms = 7, 
+    tenants = 2,
+    image
+}) => {
     const [modalVisible, setModalVisible] = React.useState(false);
     const router = useRouter();
 
     const img = {
-        uri: require("@/assets/images/example-home.jpg")
+        uri: image || require("@/assets/images/example-home.jpg")
     }
 
     return (
@@ -56,8 +70,8 @@ const PropertyCard: React.FC<Props> = ({ id }) => {
                     contentFit="cover"
                 />
                 <View>
-                    <Text className="text-lg font-semibold text-primary">Apartment</Text>
-                    <Text className="text-xl max-w-60 line-clamp-1">Sinza Apartment Flat no. {id}</Text>
+                    <Text className="text-lg font-semibold text-primary">{type}</Text>
+                    <Text className="text-xl max-w-60 line-clamp-1">{name}</Text>
 
                     <View style={{
                         flexDirection: "row",
@@ -65,8 +79,8 @@ const PropertyCard: React.FC<Props> = ({ id }) => {
                         marginTop: 8,
                         gap: 48,
                     }}>
-                        <Text className="text-sm text-primary">Rooms: 7</Text>
-                        <Text className="text-sm text-primary">Tenants: 2</Text>
+                        <Text className="text-sm text-primary">Rooms: {rooms}</Text>
+                        <Text className="text-sm text-primary">Tenants: {tenants}</Text>
                         </View>
                 </View>
             </Pressable>

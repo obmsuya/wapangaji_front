@@ -1,0 +1,72 @@
+{
+    "owner":"davod",
+    "name":"lilan towers",
+    "category":"villa",
+    "block":"A",
+    "total_floors":1,
+    "location":"Lund ",
+    "address":"Alpha estate,   clayton road",
+    "total_area":300,
+    "total_units":50,
+    "prop_image":"C:\\fakepath\\s3.png",
+    "no_floors":1,
+    "floors":[
+       {
+          "floor":{
+             "floor_no":0,
+             "units_ids":[
+                1,
+                10
+             ],
+             "units_total":2,
+             "layout_data":"<svg viewBox=\"0 0 300 300\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"40\" height=\"40\" x=\"0\" y=\"0\" id=\"1\" class=\"mysvg\" style=\"fill: orange; stroke: gray; stroke-width: 5; fill-opacity: 0.6;\"></rect> <rect width=\"40\" height=\"40\" x=\"40\" y=\"0\" id=\"10\" class=\"mysvg\" style=\"fill: orange; stroke: gray; stroke-width: 5; fill-opacity: 0.6;\"></rect></svg>",
+             
+             "area":300,
+             "units":[
+                {
+                   "utilities":{
+                      "electricity":"false",
+                      "water":"false",
+                      "wifi":"false"
+                   },
+                   "svg_id":1,
+                   "svg_geom":"<rect xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"40\" x=\"0\" y=\"0\" id=\"1\" class=\"mysvg\" style=\"fill: green; stroke: gray; stroke-width: 5; fill-opacity: 0.6;\"/>",
+                   "block":"A",
+                   "floor_number":0,
+                   "unit_name":"A1",
+                   "area_sqm":150,
+                   "bedrooms":3,
+                   "status":"occupied",
+                   "rent_amount":2000,
+                   "payment_freq":"quarterly",
+                   "meter_number":"232345",
+                   "included_in_rent":"false",
+                   "cost_allocation":"landlord",
+                   "notes":"allocated"
+                },
+                {
+                   "utilities":{
+                      "electricity":"true",
+                      "water":"true",
+                      "wifi":"true"
+                   },
+                   "svg_id":10,
+                   "svg_geom":"<rect xmlns=\"http://www.w3.org/2000/svg\" width=\"40\" height=\"40\" x=\"40\" y=\"0\" id=\"10\" class=\"mysvg\" style=\"fill: green; stroke: gray; stroke-width: 5; fill-opacity: 0.6;\"/>",
+                   "block":"A1",
+                   "floor_number":0,
+                   "unit_name":"A2",
+                   "area_sqm":150,
+                   "bedrooms":2,
+                   "status":"reserved",
+                   "rent_amount":20000,
+                   "payment_freq":"biannual",
+                   "meter_number":"34490",
+                   "included_in_rent":"true",
+                   "cost_allocation":"tenant",
+                   "notes":"Not ready"
+                }
+             ]
+          }
+       }
+    ]
+ }

@@ -61,17 +61,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const response = await api.post('auth/login/', { phone_number, password });
 
-            const { access, refresh } = response.data;
-            console.log(access);
+            const { tokens } = response.data;
+            console.log(tokens.access);
 
             // Store tokens in state and AsyncStorage
-            setAccess(access);
-            setRefresh(refresh);
+            setAccess(tokens.access);
+            setRefresh(tokens.refresh);
             setIsAuthenticated(true);
 
 
-            await AsyncStorage.setItem('access', access);
-            await AsyncStorage.setItem('refresh', refresh);
+            await AsyncStorage.setItem('access', tokens.access);
+            await AsyncStorage.setItem('refresh', tokens.refresh);
 
             router.replace('(user)')
 
@@ -99,15 +99,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsLoading(true);
         try {
             const response = await api.post('auth/register/', { phone_number, full_name, password });
-            const { access, refresh } = response.data;
+            const { tokens } = response.data;
 
             // Store tokens in state and AsyncStorage
-            setAccess(access);
-            setRefresh(refresh);
+            setAccess(tokens.access);
+            setRefresh(tokens.refresh);
             setIsAuthenticated(true);
 
-            await AsyncStorage.setItem('access', access);
-            await AsyncStorage.setItem('refresh', refresh);
+            await AsyncStorage.setItem('access', tokens.access);
+            await AsyncStorage.setItem('refresh', tokens.refresh);
 
             router.replace('(user)/(property)/add-property')
 

@@ -1,29 +1,47 @@
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { Button } from '../ui/Button'
-import SlideTransition from '../slide-transition'
-import { UnitDetails } from '../new-property/unit-details'
-import { useUnitStore } from '@/lib/zustand'
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import { Button } from "@/components/ui/Button";
+import { Text } from "@/components/ui/Text";
+import FloorPlanDetails from "../new-property/floor-plan";
+import { usePropertyStore } from "@/lib/zustand";
 
 interface props {
-    step: number
-    prevStep: (step: number) => void
+    step: number;
+    nextStep: (step: number) => void;
+    prevStep: (step: number) => void;
 }
 
-const StepFour: React.FunctionComponent<props> = ({ step, prevStep }) => {
-    const { totalFloors } = useUnitStore()
+const StepFour: React.FunctionComponent<props> = ({ step, nextStep, prevStep }) => {
+    const { floorPlans } = usePropertyStore();
+    
+    const handleNext = () => {
+        // Validate that at least one floor has units
+        if (Object.keys(floorPlans).length === 0) {
+            alert('Please create at least one floor plan before proceeding');
+            return;
+        }
+        
+        nextStep(step);
+    };
+
     return (
-        <View>
-            <UnitDetails
-                onNext={() => console.log("Next")}
-                onBack={() => console.log("Prev")} />
-            <Button
-                onPress={() => prevStep(step)}
-            >Previous</Button>
+        <View className="flex-1 gap-4">
+            <Text variant="huge" className="text-center mt-8">Floor Plan</Text>
+            
+            <FloorPlanDetails />
+            
+            <View className="flex-row gap-2 self-end">
+                <Button
+                    onPress={() => prevStep(step)}
+                >Previous</Button>
+                <Button
+                    onPress={handleNext}
+                >Next</Button>
+            </View>
         </View>
-    )
-}
+    );
+};
 
-export default StepFour
+export default StepFour;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});

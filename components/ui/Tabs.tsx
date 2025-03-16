@@ -25,7 +25,7 @@ const TabsTrigger = React.forwardRef<TabsPrimitive.TriggerRef, TabsPrimitive.Tri
     return (
       <TextClassContext.Provider
         value={cn(
-          'text-sm native:text-base font-medium text-muted-foreground web:transition-all',
+          'text-sm native:text-base font-medium text-muted-foreground web:transition-all w-full px-8',
           value === props.value && 'text-foreground'
         )}
       >

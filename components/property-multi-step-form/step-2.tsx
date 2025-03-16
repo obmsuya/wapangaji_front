@@ -9,7 +9,7 @@ import { Image } from "expo-image"
 import { Images } from "lucide-react-native"
 import * as ImagePicker from 'expo-image-picker';
 
-import SlideTransition from "../slide-transition"
+import { usePropertyStore } from "@/lib/zustand"
 
 interface props {
     step: number
@@ -18,14 +18,17 @@ interface props {
 }
 
 const StepTwo: React.FunctionComponent<props> = ({ step, nextStep, prevStep }) => {
-    const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
+    const { propertyDetails, setPropertyDetails } = usePropertyStore();
+    const [propertyName, setPropertyName] = useState(propertyDetails.name || "");
+    const [propertyLocation, setPropertyLocation] = useState(propertyDetails.location || "");
+    const [selectedImage, setSelectedImage] = useState<string | undefined>(propertyDetails.image || undefined);
 
     const propertyNameRef = useRef<TextInput>(null)
     const propertyLocationRef = useRef<TextInput>(null)
 
     const pickImageAsync = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ['images'],
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
             quality: 0.75,
         });
@@ -35,6 +38,26 @@ const StepTwo: React.FunctionComponent<props> = ({ step, nextStep, prevStep }) =
         } else {
             alert('You did not select any image.');
         }
+    };
+
+    const handleNext = () => {
+        if (!propertyName.trim()) {
+            alert('Please enter a property name');
+            return;
+        }
+        
+        if (!propertyLocation.trim()) {
+            alert('Please enter a property location');
+            return;
+        }
+        
+        setPropertyDetails({
+            name: propertyName,
+            location: propertyLocation,
+            image: selectedImage || ""
+        });
+        
+        nextStep(step);
     };
 
     return (
@@ -47,6 +70,8 @@ const StepTwo: React.FunctionComponent<props> = ({ step, nextStep, prevStep }) =
                     <Input
                         className="bg-gray-200"
                         placeholder="Enter your property's name"
+                        value={propertyName}
+                        onChangeText={setPropertyName}
                     />
                 </View>
                 <View className="gap-2">
@@ -54,6 +79,8 @@ const StepTwo: React.FunctionComponent<props> = ({ step, nextStep, prevStep }) =
                     <Input
                         className="bg-gray-200"
                         placeholder="Enter your property's location"
+                        value={propertyLocation}
+                        onChangeText={setPropertyLocation}
                     />
                 </View>
                 <View className="gap-2">
@@ -97,7 +124,7 @@ const StepTwo: React.FunctionComponent<props> = ({ step, nextStep, prevStep }) =
                     onPress={() => prevStep(step)}
                 >Previous</Button>
                 <Button
-                    onPress={() => nextStep(step)}
+                    onPress={handleNext}
                 >Next</Button>
             </View>
         </View>

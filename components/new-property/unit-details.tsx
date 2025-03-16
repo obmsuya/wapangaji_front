@@ -3,7 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
-import { Unit, useFloorPlanStore, useUnitStore } from "@/lib/zustand";
+import { Unit, usePropertyStore } from "@/lib/zustand";
 
 import Svg, { Rect } from "react-native-svg";
 import { BottomSheetModal, BottomSheetScrollView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
@@ -45,11 +45,20 @@ const UnitValidationSchema = Yup.object().shape({
     notes: Yup.string(),
 });
 
-export const UnitDetails: React.FC<UnitDetailsProps> = () => {
-    const { floorPlans, currentFloor, selectedUnits } = useFloorPlanStore();
-    const { units, addUnit } = useUnitStore();
-    
-    const [selectedUnitId, setSelectedUnitId] = useState(0);
+export const UnitDetails: React.FC<UnitDetailsProps> = ({ onNext, onBack }) => {
+    const {
+        floorPlans,
+        currentFloor,
+        selectedUnits,
+        units,
+        addUnitDetails,
+        setSelectedUnitId,
+        selectedUnitId,
+        setModalVisible
+    } = usePropertyStore();
+
+    const [localSelectedUnitId, setLocalSelectedUnitId] = useState<number>(0);
+
     const currentFloorPlan = floorPlans[currentFloor];
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -58,20 +67,19 @@ export const UnitDetails: React.FC<UnitDetailsProps> = () => {
     const animatedIndex = useSharedValue(0);
     const animatedPosition = useSharedValue(0);
 
-    const x = (selectedUnitId % GRID_SIZE) * CELL_SIZE;
-    const y = Math.floor(selectedUnitId / GRID_SIZE) * CELL_SIZE;
-
-    React.useEffect(() => {
-        console.log(floorPlans)
-    }, [])
+    const x = (localSelectedUnitId % GRID_SIZE) * CELL_SIZE;
+    const y = Math.floor(localSelectedUnitId / GRID_SIZE) * CELL_SIZE;
 
     // callbacks
-    const handlePresentModalPress = useCallback((unitId: any) => {
-        setSelectedUnitId(unitId)
+    const handlePresentModalPress = useCallback((unitId: number) => {
+        setLocalSelectedUnitId(unitId);
+        setSelectedUnitId(unitId.toString());
+        setModalVisible(true);
         bottomSheetModalRef.current?.present();
     }, []);
 
     const handleDismissModalPress = useCallback(() => {
+        setModalVisible(false);
         bottomSheetModalRef.current?.dismiss();
     }, []);
 
@@ -92,16 +100,24 @@ export const UnitDetails: React.FC<UnitDetailsProps> = () => {
         try {
             const unitData: Unit = {
                 ...values,
-                svg_id: selectedUnitId ? selectedUnitId.toString() : '',
+                svg_id: localSelectedUnitId.toString(),
                 svg_geom: `${x},${y}`,
             };
-            // Add to your store or API here
-            addUnit(unitData)
+            // Add to property store
+            addUnitDetails(unitData);
             console.log('Unit Data:', unitData);
             handleDismissModalPress();
         } catch (error) {
             console.error('Error saving unit:', error);
         }
+    };
+
+    // Find existing unit data for the selected unit
+    const findExistingUnitData = (unitId: number): Unit | undefined => {
+        return units.find(unit =>
+            unit.svg_id === unitId.toString() &&
+            unit.floor_number === currentFloor
+        );
     };
 
     return (
@@ -115,7 +131,13 @@ export const UnitDetails: React.FC<UnitDetailsProps> = () => {
                 {currentFloorPlan?.units.map((unit) => {
                     const x = (unit.unitId % GRID_SIZE) * CELL_SIZE;
                     const y = Math.floor(unit.unitId / GRID_SIZE) * CELL_SIZE;
-                    
+
+                    // Check if this unit has details filled
+                    const hasDetails = units.some(u =>
+                        u.svg_id === unit.unitId.toString() &&
+                        u.floor_number === currentFloor
+                    );
+
                     return (
                         <Rect
                             key={unit.unitId}
@@ -123,7 +145,7 @@ export const UnitDetails: React.FC<UnitDetailsProps> = () => {
                             height={CELL_SIZE}
                             x={x}
                             y={y}
-                            fill="orange"
+                            fill={hasDetails ? "green" : "orange"}
                             stroke="black"
                             strokeWidth={2}
                             onPress={() => handlePresentModalPress(unit.unitId)}
@@ -131,6 +153,11 @@ export const UnitDetails: React.FC<UnitDetailsProps> = () => {
                     );
                 })}
             </Svg>
+
+            <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+                <Button onPress={onBack}>Back</Button>
+                <Button onPress={onNext}>Next</Button>
+            </View>
 
             <BottomSheetModal
                 ref={bottomSheetModalRef}
@@ -142,17 +169,17 @@ export const UnitDetails: React.FC<UnitDetailsProps> = () => {
                 enableDismissOnClose={true}
                 backdropComponent={renderBackdrop}
             >
-                <KeyboardAwareScrollView
-                    keyboardShouldPersistTaps="always"
-                    enableOnAndroid={true}
-                    enableAutomaticScroll={true}
-                    enableResetScrollToCoords={true}
-                >
-                    <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
+                <BottomSheetScrollView contentContainerStyle={styles.contentContainer}>
+                    <KeyboardAwareScrollView
+                        keyboardShouldPersistTaps="always"
+                        enableOnAndroid={true}
+                        enableAutomaticScroll={true}
+                        enableResetScrollToCoords={true}
+                    >
                         <Text variant="large" className="text-center my-2">Unit Details</Text>
 
                         <Formik
-                            initialValues={{
+                            initialValues={findExistingUnitData(localSelectedUnitId) || {
                                 block: '',
                                 floor_number: currentFloor,
                                 unit_name: '',
@@ -173,6 +200,7 @@ export const UnitDetails: React.FC<UnitDetailsProps> = () => {
                             }}
                             validationSchema={UnitValidationSchema}
                             onSubmit={handleSubmitUnit}
+                            enableReinitialize
                         >
                             {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
                                 <View className="gap-4">
@@ -231,96 +259,107 @@ export const UnitDetails: React.FC<UnitDetailsProps> = () => {
                                         )}
                                     </View>
 
-                                    {/* Continue with other fields following the same pattern */}
-                                    <View className="flex flex-row gap-4">
-                                        <View className="flex gap-2 flex-row items-center">
-                                            <Checkbox
-                                                checked={values.utilities.electricity}
-                                                onCheckedChange={(checked) =>
-                                                    setFieldValue('utilities.electricity', checked)}
-                                            />
-                                            <Text>Electricity</Text>
-                                        </View>
-                                        <View className="flex gap-2 flex-row items-center">
-                                            <Checkbox
-                                                checked={values.utilities.water}
-                                                onCheckedChange={(checked) =>
-                                                    setFieldValue('utilities.water', checked)}
-                                            />
-                                            <Text>Water</Text>
-                                        </View>
-                                        <View className="flex gap-2 flex-row items-center">
-                                            <Checkbox
-                                                checked={values.utilities.wifi}
-                                                onCheckedChange={(checked) =>
-                                                    setFieldValue('utilities.wifi', checked)}
-                                            />
-                                            <Text>Wifi</Text>
-                                        </View>
+                                    <View className="w-full gap-2">
+                                        <Text>Bedrooms</Text>
+                                        <Input
+                                            placeholder=""
+                                            onChangeText={handleChange('bedrooms')}
+                                            onBlur={handleBlur('bedrooms')}
+                                            value={`${values.bedrooms}`}
+                                            keyboardType="numeric"
+                                        />
+                                        {errors.bedrooms && touched.bedrooms && (
+                                            <Text className="text-red-500 text-sm">{errors.bedrooms}</Text>
+                                        )}
                                     </View>
 
-                                    <View className="flex flex-row gap-4">
-                                        <View className="w-[48%] gap-2">
-                                            <Text>Bedrooms</Text>
-                                            <Input
-                                                placeholder=""
-                                                onChangeText={handleChange('bedrooms')}
-                                                onBlur={handleBlur('bedrooms')}
-                                                value={`${values.bedrooms}`}
-                                                keyboardType="numeric"
-                                            />
-                                            {errors.bedrooms && touched.bedrooms && (
-                                                <Text className="text-red-500 text-sm">{errors.bedrooms}</Text>
-                                            )}
-                                        </View>
-
-                                        <View className="w-[48%] gap-2">
-                                            <Text>Status</Text>
+                                    <View className="w-full gap-2">
+                                        <Text>Status</Text>
+                                        <View className="border border-gray-300 rounded-md">
                                             <Picker
                                                 selectedValue={values.status}
-                                                onValueChange={(itemValue, itemIndex) =>
-                                                    setFieldValue('status', itemValue)}
+                                                onValueChange={(itemValue) => setFieldValue('status', itemValue)}
                                             >
                                                 <Picker.Item label="Available" value="available" />
                                                 <Picker.Item label="Occupied" value="occupied" />
-                                                <Picker.Item label="maintenance" value="maintenance" />
+                                                <Picker.Item label="Maintenance" value="maintenance" />
+                                                <Picker.Item label="Reserved" value="reserved" />
                                             </Picker>
                                         </View>
+                                        {errors.status && touched.status && (
+                                            <Text className="text-red-500 text-sm">{errors.status}</Text>
+                                        )}
                                     </View>
 
-                                    <View className="flex flex-row gap-4">
-                                        <View className="w-[48%] gap-2">
-                                            <Text>Rent</Text>
-                                            <Input
-                                                placeholder=""
-                                                onChangeText={handleChange('rent_amount')}
-                                                onBlur={handleBlur('rent_amount')}
-                                                value={`${values.rent_amount}`}
-                                                keyboardType="numeric"
-                                            />
-                                            {errors.rent_amount && touched.rent_amount && (
-                                                <Text className="text-red-500 text-sm">{errors.rent_amount}</Text>
-                                            )}
-                                        </View>
+                                    <View className="w-full gap-2">
+                                        <Text>Rent Amount</Text>
+                                        <Input
+                                            placeholder=""
+                                            onChangeText={handleChange('rent_amount')}
+                                            onBlur={handleBlur('rent_amount')}
+                                            value={`${values.rent_amount}`}
+                                            keyboardType="numeric"
+                                        />
+                                        {errors.rent_amount && touched.rent_amount && (
+                                            <Text className="text-red-500 text-sm">{errors.rent_amount}</Text>
+                                        )}
+                                    </View>
 
-                                        <View className="w-[48%] gap-2">
-                                            <Text>Payment Frequency</Text>
+                                    <View className="w-full gap-2">
+                                        <Text>Payment Frequency</Text>
+                                        <View className="border border-gray-300 rounded-md">
                                             <Picker
                                                 selectedValue={values.payment_freq}
-                                                onValueChange={(itemValue, itemIndex) =>
-                                                    setFieldValue('payment_freq', itemValue)}
+                                                onValueChange={(itemValue) => setFieldValue('payment_freq', itemValue)}
                                             >
                                                 <Picker.Item label="Monthly" value="monthly" />
                                                 <Picker.Item label="Quarterly" value="quarterly" />
                                                 <Picker.Item label="Biannual" value="biannual" />
+                                                <Picker.Item label="Custom" value="custom" />
                                             </Picker>
+                                        </View>
+                                        {errors.payment_freq && touched.payment_freq && (
+                                            <Text className="text-red-500 text-sm">{errors.payment_freq}</Text>
+                                        )}
+                                    </View>
+
+                                    <View className="w-full gap-2">
+                                        <Text>Utilities</Text>
+                                        <View className="flex-row gap-4">
+                                            <View className="flex gap-2 flex-row items-center">
+                                                <Checkbox
+                                                    checked={values.utilities.electricity}
+                                                    onCheckedChange={(checked) =>
+                                                        setFieldValue('utilities.electricity', checked)
+                                                    }
+                                                />
+                                                <Text>Electricity</Text>
+                                            </View>
+                                            <View className="flex gap-2 flex-row items-center">
+                                                <Checkbox
+                                                    checked={values.utilities.water}
+                                                    onCheckedChange={(checked) =>
+                                                        setFieldValue('utilities.water', checked)
+                                                    }
+                                                />
+                                                <Text>Water</Text>
+                                            </View>
+                                            <View className="flex gap-2 flex-row items-center">
+                                                <Checkbox
+                                                    checked={values.utilities.wifi}
+                                                    onCheckedChange={(checked) =>
+                                                        setFieldValue('utilities.wifi', checked)
+                                                    }
+                                                />
+                                                <Text>WiFi</Text>
+                                            </View>
                                         </View>
                                     </View>
 
                                     <View className="w-full gap-2">
-                                        <Text>Meter No.</Text>
+                                        <Text>Meter Number</Text>
                                         <Input
-                                            placeholder=""
+                                            placeholder="Enter meter number"
                                             onChangeText={handleChange('meter_number')}
                                             onBlur={handleBlur('meter_number')}
                                             value={`${values.meter_number}`}
@@ -369,9 +408,10 @@ export const UnitDetails: React.FC<UnitDetailsProps> = () => {
                                 </View>
                             )}
                         </Formik>
-                    </BottomSheetScrollView>
-                </KeyboardAwareScrollView>
+                    </KeyboardAwareScrollView>
+                </BottomSheetScrollView>
             </BottomSheetModal>
+
         </ScrollView>
     );
 };
