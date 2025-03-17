@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 
 import { ArrowLeft, Eye, EyeClosed } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient'
 
 import * as yup from "yup"
 import { Formik } from "formik";
@@ -71,7 +72,7 @@ export default function login() {
     }, [keyboard])
 
     return (
-        <SafeAreaView className="px-[20%] py-2 relative bg-white flex-1 w-full justify-center">
+        <SafeAreaView className="px-[20%] py-2 relative flex-1 w-full justify-center">
             <Button className="bg-primary w-10 h-10 rounded-full p-2 items-center justify-center"
                 android_ripple={{
                     color: "#ffffff"
@@ -87,7 +88,7 @@ export default function login() {
                 showsVerticalScrollIndicator={false}
                 keyboardOpeningTime={0}
                 keyboardShouldPersistTaps="handled"
-                contentContainerClassName="w-full relative bg-white flex-1 w-full justify-center mb-20"
+                contentContainerClassName="w-full relative flex-1 w-full justify-center mb-20"
             >
                 <View
                     className={keyboard ? "mt-[10%]" : "mt-[12.5%]"}

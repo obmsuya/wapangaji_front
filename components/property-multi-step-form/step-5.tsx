@@ -1,6 +1,5 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Text";
 import { UnitDetails } from "../new-property/unit-details";
 import { usePropertyStore } from "@/lib/zustand";
@@ -27,6 +26,9 @@ const StepFive: React.FunctionComponent<props> = ({ step, nextStep, prevStep }) 
     return (
         <View className="flex-1 gap-4">
             <Text variant="huge" className="text-center mt-8">Unit Details</Text>
+            <Text className="text-center mb-4">
+                Select units from any floor to add details
+            </Text>
 
             <UnitDetails
                 onNext={handleNext}

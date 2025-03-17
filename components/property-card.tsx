@@ -20,11 +20,11 @@ interface Props {
     tenants?: number;
 }
 
-const PropertyCard: React.FC<Props> = ({ 
-    id, 
-    name = "Sinza Apartment", 
-    type = "Apartment", 
-    rooms = 7, 
+const PropertyCard: React.FC<Props> = ({
+    id,
+    name = "Sinza Apartment",
+    type = "Apartment",
+    rooms = 7,
     tenants = 2,
     image
 }) => {
@@ -36,14 +36,9 @@ const PropertyCard: React.FC<Props> = ({
     }
 
     return (
-        <Pressable
+        <View
             key={id}
-            style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 16,
-                justifyContent: "space-between"
-            }}
+            className="flex-row items-center bg-white rounded-xl w-full border justify-between"
         >
             <Pressable
                 style={{
@@ -81,12 +76,12 @@ const PropertyCard: React.FC<Props> = ({
                     }}>
                         <Text className="text-sm text-primary">Rooms: {rooms}</Text>
                         <Text className="text-sm text-primary">Tenants: {tenants}</Text>
-                        </View>
+                    </View>
                 </View>
             </Pressable>
 
             <Pressable
-                className="w-10 h-10 rounded-full bg-destructive flex items-center justify-center ml-14"
+                className="w-10 h-10 rounded-full bg-destructive flex items-center justify-center"
                 onPress={() => setModalVisible(true)}
             >
                 <Trash2
@@ -142,7 +137,7 @@ const PropertyCard: React.FC<Props> = ({
             </Modal>
             <View>
             </View>
-        </Pressable>
+        </View>
     )
 }
 

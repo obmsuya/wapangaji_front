@@ -10,12 +10,14 @@ import { BottomSheetModal, BottomSheetScrollView, BottomSheetBackdrop } from '@g
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Animated, { useSharedValue } from "react-native-reanimated"
 
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { Text } from "../ui/Text";
 import { Input } from "../ui/Input";
 import { Picker } from '@react-native-picker/picker';
 import { Checkbox } from "../ui/Checkbox"
 import { Button } from "../ui/Button";
+import DropDownPicker from "react-native-dropdown-picker";
+import Toast from 'react-native-toast-message';
 
 const GRID_SIZE = 8;
 const CELL_SIZE = 40;
@@ -54,12 +56,12 @@ export const UnitDetails: React.FC<UnitDetailsProps> = ({ onNext, onBack }) => {
         addUnitDetails,
         setSelectedUnitId,
         selectedUnitId,
-        setModalVisible
+        setModalVisible,
+        setCurrentFloor
     } = usePropertyStore();
 
     const [localSelectedUnitId, setLocalSelectedUnitId] = useState<number>(0);
-
-    const currentFloorPlan = floorPlans[currentFloor];
+    const [selectedFloorNumber, setSelectedFloorNumber] = useState<number>(currentFloor);
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const snapPoints = useMemo(() => ['75%', '100%'], []);
@@ -70,8 +72,14 @@ export const UnitDetails: React.FC<UnitDetailsProps> = ({ onNext, onBack }) => {
     const x = (localSelectedUnitId % GRID_SIZE) * CELL_SIZE;
     const y = Math.floor(localSelectedUnitId / GRID_SIZE) * CELL_SIZE;
 
+    // Get all available floor numbers
+    const floorNumbers = useMemo(() => {
+        return Object.keys(floorPlans).map(Number).sort((a, b) => a - b);
+    }, [floorPlans]);
+
     // callbacks
-    const handlePresentModalPress = useCallback((unitId: number) => {
+    const handlePresentModalPress = useCallback((floorNumber: number, unitId: number) => {
+        setSelectedFloorNumber(floorNumber);
         setLocalSelectedUnitId(unitId);
         setSelectedUnitId(unitId.toString());
         setModalVisible(true);
@@ -100,6 +108,7 @@ export const UnitDetails: React.FC<UnitDetailsProps> = ({ onNext, onBack }) => {
         try {
             const unitData: Unit = {
                 ...values,
+                floor_number: selectedFloorNumber, // Use the selected floor number
                 svg_id: localSelectedUnitId.toString(),
                 svg_geom: `${x},${y}`,
             };
@@ -107,52 +116,122 @@ export const UnitDetails: React.FC<UnitDetailsProps> = ({ onNext, onBack }) => {
             addUnitDetails(unitData);
             console.log('Unit Data:', unitData);
             handleDismissModalPress();
+            
+            // Show success toast
+            Toast.show({
+                type: 'success',
+                text1: 'Success',
+                text2: 'Unit details saved successfully',
+            });
         } catch (error) {
             console.error('Error saving unit:', error);
         }
     };
 
     // Find existing unit data for the selected unit
-    const findExistingUnitData = (unitId: number): Unit | undefined => {
+    const findExistingUnitData = (floorNumber: number, unitId: number): Unit | undefined => {
         return units.find(unit =>
             unit.svg_id === unitId.toString() &&
-            unit.floor_number === currentFloor
+            unit.floor_number === floorNumber
         );
     };
 
     return (
-        <ScrollView contentContainerStyle={{ padding: 20, alignItems: "center" }}>
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>Unit Details</Text>
-            <Text style={{ marginVertical: 10 }}>
-                Floor {currentFloor} - Selected Units: {selectedUnits.length}
+        <ScrollView contentContainerStyle={{ padding: 20 }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold", textAlign: "center", marginBottom: 16 }}>
+                Unit Details for All Floors
             </Text>
+            
+            {/* Floor tabs */}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                    {floorNumbers.map((floorNumber) => (
+                        <TouchableOpacity
+                            key={`floor-tab-${floorNumber}`}
+                            style={{
+                                backgroundColor: selectedFloorNumber === floorNumber ? '#2B4B80' : '#e0e0e0',
+                                paddingHorizontal: 16,
+                                paddingVertical: 8,
+                                borderRadius: 8,
+                                marginRight: 8
+                            }}
+                            onPress={() => setSelectedFloorNumber(floorNumber)}
+                        >
+                            <Text style={{ 
+                                color: selectedFloorNumber === floorNumber ? 'white' : 'black',
+                                fontWeight: selectedFloorNumber === floorNumber ? 'bold' : 'normal'
+                            }}>
+                                Floor {floorNumber}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            </ScrollView>
+            
+            {/* Display units for the selected floor */}
+            {floorPlans[selectedFloorNumber] ? (
+                <View style={{ alignItems: "center" }}>
+                    <Text style={{ marginVertical: 10 }}>
+                        Floor {selectedFloorNumber} - Units: {floorPlans[selectedFloorNumber].units.length}
+                    </Text>
 
-            <Svg width={GRID_SIZE * CELL_SIZE} height={GRID_SIZE * CELL_SIZE}>
-                {currentFloorPlan?.units.map((unit) => {
-                    const x = (unit.unitId % GRID_SIZE) * CELL_SIZE;
-                    const y = Math.floor(unit.unitId / GRID_SIZE) * CELL_SIZE;
+                    <Svg width={GRID_SIZE * CELL_SIZE} height={GRID_SIZE * CELL_SIZE}>
+                        {floorPlans[selectedFloorNumber].units.map((unit) => {
+                            const x = (unit.unitId % GRID_SIZE) * CELL_SIZE;
+                            const y = Math.floor(unit.unitId / GRID_SIZE) * CELL_SIZE;
 
-                    // Check if this unit has details filled
-                    const hasDetails = units.some(u =>
-                        u.svg_id === unit.unitId.toString() &&
-                        u.floor_number === currentFloor
-                    );
+                            // Check if this unit has details filled
+                            const hasDetails = units.some(u =>
+                                u.svg_id === unit.unitId.toString() &&
+                                u.floor_number === selectedFloorNumber
+                            );
 
+                            return (
+                                <Rect
+                                    key={unit.unitId}
+                                    width={CELL_SIZE}
+                                    height={CELL_SIZE}
+                                    x={x}
+                                    y={y}
+                                    fill={hasDetails ? "green" : "orange"}
+                                    stroke="black"
+                                    strokeWidth={2}
+                                    onPress={() => handlePresentModalPress(selectedFloorNumber, unit.unitId)}
+                                />
+                            );
+                        })}
+                    </Svg>
+                </View>
+            ) : (
+                <View style={{ padding: 20, alignItems: 'center' }}>
+                    <Text>No floor plan available for Floor {selectedFloorNumber}</Text>
+                </View>
+            )}
+
+            {/* Floor summary */}
+            <View style={{ marginTop: 24, marginBottom: 16 }}>
+                <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 8 }}>Floor Summary</Text>
+                
+                {floorNumbers.map((floorNumber) => {
+                    const floorPlan = floorPlans[floorNumber];
+                    const floorUnitCount = floorPlan?.units.length || 0;
+                    const detailedUnitsCount = units.filter(u => u.floor_number === floorNumber).length;
+                    
                     return (
-                        <Rect
-                            key={unit.unitId}
-                            width={CELL_SIZE}
-                            height={CELL_SIZE}
-                            x={x}
-                            y={y}
-                            fill={hasDetails ? "green" : "orange"}
-                            stroke="black"
-                            strokeWidth={2}
-                            onPress={() => handlePresentModalPress(unit.unitId)}
-                        />
+                        <View key={`summary-${floorNumber}`} style={{ 
+                            flexDirection: 'row', 
+                            justifyContent: 'space-between',
+                            padding: 12,
+                            backgroundColor: '#f5f5f5',
+                            borderRadius: 8,
+                            marginBottom: 8
+                        }}>
+                            <Text>Floor {floorNumber}</Text>
+                            <Text>Units: {detailedUnitsCount}/{floorUnitCount}</Text>
+                        </View>
                     );
                 })}
-            </Svg>
+            </View>
 
             <View style={{ marginTop: 20, flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
                 <Button onPress={onBack}>Back</Button>
@@ -175,13 +254,16 @@ export const UnitDetails: React.FC<UnitDetailsProps> = ({ onNext, onBack }) => {
                         enableOnAndroid={true}
                         enableAutomaticScroll={true}
                         enableResetScrollToCoords={true}
+                        className="flex-1"
                     >
-                        <Text variant="large" className="text-center my-2">Unit Details</Text>
+                        <Text variant="large" className="text-center my-2">
+                            Unit Details for Floor {selectedFloorNumber}, Unit {localSelectedUnitId}
+                        </Text>
 
                         <Formik
-                            initialValues={findExistingUnitData(localSelectedUnitId) || {
+                            initialValues={findExistingUnitData(selectedFloorNumber, localSelectedUnitId) || {
                                 block: '',
-                                floor_number: currentFloor,
+                                floor_number: selectedFloorNumber,
                                 unit_name: '',
                                 area_sqm: 0,
                                 bedrooms: 0,
@@ -362,8 +444,7 @@ export const UnitDetails: React.FC<UnitDetailsProps> = ({ onNext, onBack }) => {
                                             placeholder="Enter meter number"
                                             onChangeText={handleChange('meter_number')}
                                             onBlur={handleBlur('meter_number')}
-                                            value={`${values.meter_number}`}
-                                            keyboardType="numeric"
+                                            value={values.meter_number}
                                         />
                                         {errors.meter_number && touched.meter_number && (
                                             <Text className="text-red-500 text-sm">{errors.meter_number}</Text>
@@ -381,14 +462,16 @@ export const UnitDetails: React.FC<UnitDetailsProps> = ({ onNext, onBack }) => {
 
                                     <View className="w-full gap-2">
                                         <Text>Cost allocation</Text>
-                                        <Picker
-                                            selectedValue={values.cost_allocation}
-                                            onValueChange={(itemValue, itemIndex) =>
-                                                setFieldValue('cost_allocation', itemValue)}
-                                        >
-                                            <Picker.Item label="Landlord" value="landlord" />
-                                            <Picker.Item label="Tenant" value="tenant" />
-                                        </Picker>
+                                        <View className="border border-gray-300 rounded-md">
+                                            <Picker
+                                                selectedValue={values.cost_allocation}
+                                                onValueChange={(itemValue) =>
+                                                    setFieldValue('cost_allocation', itemValue)}
+                                            >
+                                                <Picker.Item label="Landlord" value="landlord" />
+                                                <Picker.Item label="Tenant" value="tenant" />
+                                            </Picker>
+                                        </View>
                                     </View>
 
                                     <View className="w-full gap-2">
@@ -397,7 +480,10 @@ export const UnitDetails: React.FC<UnitDetailsProps> = ({ onNext, onBack }) => {
                                             placeholder=""
                                             onChangeText={handleChange('notes')}
                                             onBlur={handleBlur('notes')}
-                                            value={`${values.notes}`}
+                                            value={values.notes}
+                                            multiline={true}
+                                            numberOfLines={4}
+                                            className="h-20 text-start"
                                         />
                                         {errors.notes && touched.notes && (
                                             <Text className="text-red-500 text-sm">{errors.notes}</Text>
@@ -411,7 +497,6 @@ export const UnitDetails: React.FC<UnitDetailsProps> = ({ onNext, onBack }) => {
                     </KeyboardAwareScrollView>
                 </BottomSheetScrollView>
             </BottomSheetModal>
-
         </ScrollView>
     );
 };
